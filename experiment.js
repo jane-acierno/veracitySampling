@@ -29,15 +29,19 @@ const contributionManipulation = jsPsych.randomization.sampleWithoutReplacement(
 // Concatenate individual manipulation outcomes to create composite condition variable
 const condition = normManipulation + "_" + politicalManipulation + "_" + contributionManipulation;
 
+// Treatment vs. Control
+const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment', 'control'], 1)[0];
+
 // Random assignment of statements: pick 5 of 18 statements
 const trials = jsPsych.randomization.shuffle([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]).slice(0, 5);
 
-// NEED TO ADD INTERVENTION VS CONTROL
+
 jsPsych.data.addProperties({
   trials: trials,
   participantId: participantId,
   studyId: studyId,
   sessionId: sessionId,
+  expcondition: expcondition
 });
 
 // const filename = `${participantId}` + "_" + `${studyId}` + "_" + `${sessionId}.csv`;
@@ -216,114 +220,62 @@ const preIntInstructions = {
   show_clickable_nav: true,
 };
 
+// Pre-intervention instructions
 timeline.push(preIntInstructions);
 
-// ID INJUNCTIVE SAMPLING INSTRUCTIONS //
-const instructionsInjunctiveID = {
+// Intervention //
+const InterventionImage = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-          Before you play the game you will get to view the opinions of the previous players on how they think people should play the game. 
-          For that study, we made sure to recruit a nationally representative sample of Americans. 
-          Today you will have the chance to view some of their responses.
-        </p>
-        <p style="text-align: left;">
-          Previous participants' political affiliation is indicated through blue and red circles around their avatars. 
-          Blue circles indicate democrats and red circles indicate republicans.
-        </p>
-        <p style="text-align: left;">
-          On the next page you will see avatars representing the people who participated in that study, 
-          with blue or red circles indicating political party affiliation (blue for democrats, red for republicans). 
-          Every time you click on an avatar, you will see the amount that that one person thinks others should contribute. 
-          You can view the contributions of as many people as you'd like before playing the game yourself.
+          <img src="intervention/intervention.webp" alt="Intervention Image" style="width: 100%;"/>
         </p>`
   ],
   show_clickable_nav: true,
 };
 
-// NO ID INJUNCTIVE SAMPLING INSTRUCTIONS //
-const instructionsInjunctiveNoID = {
+// Control //
+const ControlImage = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-          Before you play the game you will get to view the opinions of the previous players on how they think people should play the game. 
-          For that study, we made sure to recruit a nationally representative sample of Americans. 
-          Today you will have the chance to view some of their responses.
-        </p>
-        <p style="text-align: left;">
-          On the next page you will see avatars representing the people who participated in that study. 
-          Every time you click on an avatar, you will see the amount that that one person thinks others should contribute. 
-          You can view the contributions of as many people as you'd like before playing the game yourself.
+          <img src="intervention/control.webp" alt="Control Image" style="width: 100%;"/>
         </p>`
   ],
   show_clickable_nav: true,
 };
 
-// NO ID DESCRIPTIVE SAMPLING INSTRUCTIONS
-const instructionsDescriptiveNoID = {
+// Receive intervention or control
+if (expcondition === 'treatment') {
+  timeline.push(
+    InterventionImage,
+  );
+} else if (expcondition === 'control') {
+  timeline.push(
+    ControlImage,
+  );
+};
+
+
+
+// Instructions //
+const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-          Before you play the game you will get to view the contributions of the previous players. 
-          For that study, we made sure to recruit a nationally representative sample of Americans. 
-          Today you will have the chance to view some of their contributions.
-        </p>
-        <p style="text-align: left;">
-          On the next page you will see avatars representing the people who participated in that study, 
-          Every time you click on an avatar, you will see the amount that that one person contributed. 
-          You can view the contributions of as many people as you'd like before playing the game yourself.
+        Now you get to see what people of various professions have to say. 
+        The avatars below represent people with the professions listed. 
+        Every time you click on an avatar, you will see whether that person 
+        thought the claim above was true or false. You can view the opinions 
+        of as many people as you would like before moving on.
         </p>`
   ],
   show_clickable_nav: true,
 };
 
-// ID DESCRIPTIVE SAMPLING INSTRUCTIONS //
-const instructionsDescriptiveID = {
-  type: jsPsychInstructions,
-  pages: [`
-        <p style="text-align: left;">
-          Before you play the game you will get to view the contributions of the previous players. 
-          For that study, we made sure to recruit a nationally representative sample of Americans. 
-          Today you will have the chance to view some of their contributions.
-        </p>
-        <p style="text-align: left;">
-            Previous participants' political affiliation is indicated through blue and red circles around their avatars. 
-            Blue circles indicate democrats and red circles indicate republicans.
-        </p>
-        <p style="text-align: left;">
-          On the next page you will see avatars representing the people who participated in that study, 
-          with blue or red circles indicating political party affiliation (blue for democrats, red for republicans). 
-          Every time you click on an avatar, you will see the amount that that one person contributed. 
-          You can view the contributions of as many people as you'd like before playing the game yourself.
-        </p>`
-  ],
-  show_clickable_nav: true,
-};
+timeline.push(preSamplingInstructions);
 
 
-
-// PUSH
-if (normManipulation === 'descriptive' && politicalManipulation === 'political') {
-  timeline.push(
-    instructionsDescriptiveID,
-    // instructionsDescriptiveIDComprehensionCheck
-  );
-} else if (normManipulation === 'descriptive' && politicalManipulation === 'nonpolitical') {
-  timeline.push(
-    instructionsDescriptiveNoID,
-    // instructionsDescriptiveNoIDComprehensionCheck
-  );
-} else if (normManipulation === 'injunctive' && politicalManipulation === 'political') {
-  timeline.push(
-    instructionsInjunctiveID,
-    // instructionsInjunctiveIDComprehensionCheck
-  );
-} else if (normManipulation === 'injunctive' && politicalManipulation === 'nonpolitical') {
-  timeline.push(
-    instructionsInjunctiveNoID,
-    // instructionsInjunctiveNoIDComprehensionCheck
-  );
-}
 
 
 function selectionTask(trialIndex, epistemicMoralCondition) {
