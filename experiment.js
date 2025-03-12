@@ -17,18 +17,6 @@ const studyId = jsPsych.data.getURLVariable('STUDY_ID');
 const sessionId = jsPsych.data.getURLVariable('SESSION_ID');
 
 // Random assignment of manipulations
-// Injunctive vs. Descriptive
-const normManipulation = jsPsych.randomization.sampleWithoutReplacement(['injunctive', 'descriptive'], 1)[0];
-
-// Political vs. Non-Political
-const politicalManipulation = jsPsych.randomization.sampleWithoutReplacement(['political', 'nonpolitical'], 1)[0];
-
-// High vs. Low Party Contribution
-const contributionManipulation = jsPsych.randomization.sampleWithoutReplacement(['dHigh_rLow', 'rHigh_dLow'], 1)[0];
-
-// Concatenate individual manipulation outcomes to create composite condition variable
-const condition = normManipulation + "_" + politicalManipulation + "_" + contributionManipulation;
-
 // Treatment vs. Control
 const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment', 'control'], 1)[0];
 
@@ -54,7 +42,7 @@ const valueOpinionOptions = ['Yes', 'Somewhat', 'No'];
 const beliefOptions = ['Definitely false', '', '', '', '','', 'Defintely True'];
 
 // Statements
-const statements = [
+const statement = [
   `"You can test positive for HPV as a result of receiving the HPV vaccine."`,
   `"Vaccines can cause sudden infant death syndrome (SIDS)."`,
   `"The chickenpox vaccine can cause infertility."`,
@@ -179,7 +167,7 @@ const preBelief = {
   preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
-    prompt: `<blockquote>${statements[index]}</blockquote>`,
+    prompt: `<blockquote>${statement[index]}</blockquote>`,
     options: ["Strongly Disagree","","","","","","Strongly Agree"],
     required: true,
     horizontal: true,
@@ -187,11 +175,13 @@ const preBelief = {
   randomize_question_order: true
 };
 
+
+
 // // USE THIS INSTEAD IF PARTICIAPNTS SHOULD RATE ALL 18 STATEMENTS, NOT JUST THE ONES THEY'LL SAMPLE FOR
 // const preBelief = {
 //   type: jsPsychSurveyMultiChoice,
 //   preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
-//   questions: statements.map((statement, index) => ({
+//   questions: statement.map((statement, index) => ({
 //     name: `preBelief${index + 1}`,
 //     prompt: `<blockquote>${statement}</blockquote>`,
 //     options: ["Strongly Disagree","","","","","","Strongly Agree"],
@@ -257,8 +247,7 @@ if (expcondition === 'treatment') {
 };
 
 
-
-// Instructions //
+// Sampling instructions //
 const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
@@ -276,15 +265,13 @@ const preSamplingInstructions = {
 timeline.push(preSamplingInstructions);
 
 
-
-
 function selectionTask(trialIndex, epistemicMoralCondition) {
   return {
     type: jsPsychSelectionLearning,
     trialIndex: trialIndex,
     avatars: avatarDictionary,
-    epistemicMoralCondition: epistemicMoralCondition,
-    statement: statements[trials[trialIndex]],
+    // epistemicMoralCondition: epistemicMoralCondition,
+    statement: statement[trials[trialIndex]],
     choices: [
       "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;Continue sampling",
       "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done"
@@ -311,56 +298,22 @@ for (let i = 0; i < 100; i++) {
 // Sampling Task
 timeline.push(selectionTask())
 
-
-const contributionPGG = {
-  type: jsPsychSurveyHtmlForm,
-  preamble: `
-    <p>Now it is time to play the game.</p>
-    <p>You have received 500 points. In the upcoming days you will be randomly grouped with 3 other participants, 
-    forming a group of 4. The other 3 participants will have also received 500 points each.</p>
-    <p>Your task is to decide how much money to transfer to the 'common pool'. 
-    You can transfer any amount from 0 to 500 points, including 0 and 500. 
-    Each of the other 3 participants will make a decision about their transfer to the common pool.</p>
-    <p>After all 4 participants in your group have reached a decision, 
-    the transfers to the common pool are summed. Then, this sum is doubled. 
-    Finally, the doubled sum in the common pool is divided equally between the 4 participants in your group. 
-    You will receive your payoff in the upcoming days.</p>
-    <p>Please indicate in the box below how many points to transfer to the common pool.</p>
-    <br>Your contribution to the common pool:<br>
-  `,
-  html: `
-    <div class="jspsych-survey-multi-choice-question">
-      <label for="contribution">Your contribution to the common pool:</label><br>
-      <input 
-        type="number" 
-        id="contribution" 
-        name="contribution" 
-        min="0" max="500" 
-        style="padding: 5px; width: 60px;" 
-        required"
-      >
-    </div>
-  `,
-
-  button_label: 'Next',
-  on_finish: function (data) {
-    const contribution = Number(data.response.contribution);
-
-    // Safeguard: Ensure a valid contribution is logged
-    const contributionPGGData = {
-      contribution: isNaN(contribution) ? 0 : contribution
-    };
-
-    // Add the data to the current trial's node
-    jsPsych.data
-      .getDataByTimelineNode(jsPsych.getCurrentTimelineNodeID())
-      .addToAll(contributionPGGData);
-  }
+// Post-sampling belief ratings for only the selected trials
+const postBelief = {
+  type: jsPsychSurveyMultiChoice,
+  preamble: `<p><strong>Now, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
+  questions: trials.map((index) => ({
+    name: `preBelief${index + 1}`,
+    prompt: `<blockquote>${statement[index]}</blockquote>`,
+    options: ["Strongly Disagree","","","","","","Strongly Agree"],
+    required: true,
+    horizontal: true,
+  })),
+  randomize_question_order: true
 };
 
-// Add the task to the timeline
-timeline.push(contributionPGG);
-
+// Post-sampling belief
+timeline.push(postBelief);
 
 // DEMOGRAPHICS //
 const demographicsQuestions = {
