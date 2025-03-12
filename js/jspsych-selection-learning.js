@@ -6,7 +6,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 	 *
 	 * SHORT PLUGIN DESCRIPTION
 	 *
-	 * @author Nathan Liang
+	 * @author Nathan Liang and Jane Acierno
 	 * @see {@link https://DOCUMENTATION_URL DOCUMENTATION LINK TEXT}
 	 */
 
@@ -30,11 +30,6 @@ var jsPsychSelectionLearning = (function (jspsych) {
 				pretty_name: "Choices",
 				default: undefined,
 				array: true,
-			},
-			epistemicMoralCondition: {
-				type: jspsych.ParameterType.STRING,
-				pretty_name: "Epistemic or Moral Condition",
-				default: undefined,
 			}
 		}
 	};
@@ -45,179 +40,36 @@ var jsPsychSelectionLearning = (function (jspsych) {
 		};
 
 		trial(display_element, trial) {
-			display_element.innerHTML +=
-				// Pt. 1: Box
-				`<div id="jspsych-instructions">
-					<div class="quote">
-						<h2>Search Task</h2>
-						<p>
-							Now you will have a chance to see what various health providers think. 
-							Click on an avatar to see that provider's opinion on the following sentence:
-						</p>
-						<blockquote>
-							${trial.statement}
-						</blockquote>
+            display_element.innerHTML += `
+			<div id="jspsych-instructions">
+                    <div class="quote">
+                        <h2>Search Task</h2>
+                        <p>Now you will have a chance to see what various health providers think. Click on an avatar to see that provider's opinion on the following sentence:</p>
+                        <blockquote>${trial.statement}</blockquote>
 					</div>
 				</div>` +
-
-				// Pt. 2: Box
 				`<div id="trial-presentation-space" class="popup"></div><div id="overlay"></div>` +
-
-				// Pt. 3: Prompt
 				`<div id="prompt-container"></div>` +
-
-				// Pt. 4: Avatar Grid
 				`<div class="grid-container-wrapper">
 					<div class="grid-container" id="avatar-grid"></div>
 				</div>`;
 
+
 			// Pre-Shuffled Ratings
-			// 2 (Norm: Descriptive vs. Injunctive) x 2 (Politics: Democrat vs. Republican) x 2 (Contribution: High vs. Low)
+			// Trustworthy vs. Untrustworthy
 			const selectionRatingsDict = {
-				descriptiveDemocratLow: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0, 0, 0, 0, 0, 1, 3, 25, 25, 25, 50, 50, 50, 50, 50, 50, 50, 50, 100, 100, 100, 100, 100, 100, 
-					100, 100, 100, 100, 100, 100, 100, 120, 125, 150, 150, 163, 175, 200, 200, 200, 200, 200, 200, 200, 
-					200, 215, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 270, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300,
-					300, 350, 350, 400, 400, 400, 400, 400, 400, 400, 400, 400, 450, 450, 499, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
+				trustworthy: jsPsych.randomization.shuffle([
+					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
+					7, 7, 7, 7, 7, 7, 7
 				]),
 
-				descriptiveDemocratHigh: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0, 0, 0, 0, 0, 1, 3, 25, 25, 25, 50, 50, 50, 50, 50, 50, 50, 50, 100, 100, 100, 100, 100, 100, 
-					100, 100, 100, 100, 100, 100, 100, 120, 125, 150, 150, 163, 175, 200, 200, 200, 200, 200, 200, 200, 
-					200, 215, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 270, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300, 300,
-					300, 350, 350, 400, 400, 400, 400, 400, 400, 400, 400, 400, 450, 450, 499, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-				]),
-
-				descriptiveRepublicanLow: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0, 0, 0, 1, 5, 10, 20, 25, 50, 50, 50, 75, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 
-					100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 150, 150, 150, 150, 175, 200, 200, 
-					200, 200, 200, 200, 200, 230, 235, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 275, 300, 300, 
-					300, 300, 300, 300, 300, 300, 300, 300, 300, 320, 325, 350, 350, 350, 350, 350, 400, 400, 400, 400, 
-					400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 450, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-				]),
-
-				descriptiveRepublicanHigh: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
-					0, 0, 0, 0, 0, 1, 5, 10, 20, 25, 50, 50, 50, 75, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 
-					100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 150, 150, 150, 150, 175, 200, 200, 
-					200, 200, 200, 200, 200, 230, 235, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 275, 300, 300, 
-					300, 300, 300, 300, 300, 300, 300, 300, 300, 320, 325, 350, 350, 350, 350, 350, 400, 400, 400, 400, 
-					400, 400, 400, 400, 400, 400, 400, 400, 400, 400, 450, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-				]),
-
-				injunctiveDemocratLow: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 44, 49, 50, 50, 50, 50, 50, 92, 96, 97, 100, 100, 100, 100, 100,
-					100, 100, 100, 100, 100, 100, 101, 125, 125, 142, 150, 165, 176, 183, 200, 200, 200, 200, 200, 200, 
-					200, 200, 201, 203, 204, 217, 240, 240, 240, 249, 249, 250, 250, 250, 250, 250, 250, 250, 250, 250,
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 251, 251, 251, 251, 252, 252, 253, 253, 
-					 254, 259, 263, 264, 271, 279, 286, 286, 300, 300, 300, 300, 300, 300, 300, 300, 301, 303, 304, 336, 
-					 350, 351, 356, 358, 360, 400, 400, 400, 400, 400, 401, 425, 426, 433, 448, 456, 460, 493, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500
-				]),
-
-				injunctiveDemocratHigh: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 42, 44, 49, 50, 50, 50, 50, 50, 92, 96, 97, 100, 100, 100, 100, 100,
-					100, 100, 100, 100, 100, 100, 101, 125, 125, 142, 150, 165, 176, 183, 200, 200, 200, 200, 200, 200, 
-					200, 200, 201, 203, 204, 217, 240, 240, 240, 249, 249, 250, 250, 250, 250, 250, 250, 250, 250, 250,
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 251, 251, 251, 251, 252, 252, 253, 253, 
-					 254, 259, 263, 264, 271, 279, 286, 286, 300, 300, 300, 300, 300, 300, 300, 300, 301, 303, 304, 336, 
-					 350, 351, 356, 358, 360, 400, 400, 400, 400, 400, 401, 425, 426, 433, 448, 456, 460, 493, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					 500, 500, 500, 500, 500, 500, 500
-				]),
-
-				injunctiveRepublicanLow: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 25, 25, 40, 46, 50, 50, 50, 50, 50, 50, 50, 94, 97, 98,
-					99, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 101, 110, 150, 150, 151, 152, 180, 180, 183, 
-					193, 194, 195, 200, 200, 200, 200, 200, 200, 206, 210, 214, 243, 248, 250, 250, 250, 250, 250, 250, 250,
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 251, 251, 251, 251, 251, 251, 251, 251,
-					251, 252, 253, 254, 255, 256, 257, 257, 261, 261, 264, 266, 266, 267, 272, 275, 290, 296, 300, 300, 300,
-					300, 300, 301, 302, 303, 306, 307, 309, 320, 325, 327, 336, 342, 350, 351, 353, 361, 362, 363, 367, 369,
-					400, 400, 400, 400, 400, 400, 400, 402, 406, 471, 499, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
-				]),
-				
-				injunctiveRepublicanHigh: jsPsych.randomization.shuffle([
-					0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 25, 25, 40, 46, 50, 50, 50, 50, 50, 50, 50, 94, 97, 98,
-					99, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 101, 101, 110, 150, 150, 151, 152, 180, 180, 183, 
-					193, 194, 195, 200, 200, 200, 200, 200, 200, 206, 210, 214, 243, 248, 250, 250, 250, 250, 250, 250, 250,
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 
-					250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 250, 251, 251, 251, 251, 251, 251, 251, 251,
-					251, 252, 253, 254, 255, 256, 257, 257, 261, 261, 264, 266, 266, 267, 272, 275, 290, 296, 300, 300, 300,
-					300, 300, 301, 302, 303, 306, 307, 309, 320, 325, 327, 336, 342, 350, 351, 353, 361, 362, 363, 367, 369,
-					400, 400, 400, 400, 400, 400, 400, 402, 406, 471, 499, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 
-					500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500, 500
+				untrustworthy: jsPsych.randomization.shuffle([
+					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+					1, 1, 1, 1, 1, 1, 1
 				]),
 			};
 
@@ -227,52 +79,37 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			// Generate circles
 			const avatarCircleContainer = $('#avatar-grid');
 
-
 			// Avatar NUMBER randomized from 1 to 100; not index 0 to 99
 			// EXAMPLE: [1, 3, 2, ..., 100]
 			const randomizedAvatarNumberArray = jsPsych.randomization.shuffle([...Array(100).keys()].map (x => x + 1));
 
-			let politicalAffiliationArray;
-			let democratAffiliationArray;
-			let republicanAffiliationArray;
+			let trustArray;
+			let trustworthyArray;
+			let untrustworthyArray;
 
-			// Create an array populated with either 'avatar-circle-democrat' or 'avatar-circle-republican' depending on index
-			// EXAMPLE: ['avatar-circle-democrat', 'avatar-circle-democrat', 'avatar-circle-republican', ..., 'avatar-circle-democrat']
-			politicalAffiliationArray = jsPsych.randomization.shuffle(
-				new Array(50).fill('avatar-circle-democrat').concat(new Array(50).fill('avatar-circle-republican'))
+			// Create an array populated with either 'avatar-circle-trustworthy' or 'avatar-circle-untrustworthy' depending on index
+			// EXAMPLE: ['avatar-circle-trustworthy', 'avatar-circle-trustworthy', 'avatar-circle-untrustworthy', ..., 'avatar-circle-trustworthy']
+			trustArray = jsPsych.randomization.shuffle(
+				new Array(50).fill('avatar-circle-trustworthy').concat(new Array(50).fill('avatar-circle-untrustworthy'))
 			);
 
-			// Split into two arrays: 50 for Democrats
+			// Split into two arrays: 50 for trustworthy
 			// EXAMPLE: [0, 2, 4, ..., 98]
-			// Get the indices of 'avatar-circle-democrat'
-			democratAffiliationArray = politicalAffiliationArray.map((affiliation, index) => affiliation === 'avatar-circle-democrat' ? index : null).filter(index => index !== null);
+			// Get the indices of 'avatar-circle-trustworthy'
+			trustworthyArray = trustArray.map((affiliation, index) => affiliation === 'avatar-circle-trustworthy' ? index : null).filter(index => index !== null);
 
-			// ...and 50 for Republicans
+			// ...and 50 for untrustworthy
 			// EXAMPLE: [1, 3, 5, ..., 99]
-			republicanAffiliationArray = politicalAffiliationArray.map((affiliation, index) => affiliation === 'avatar-circle-republican' ? index : null).filter(index => index !== null);
+			untrustworthyArray = trustArray.map((affiliation, index) => affiliation === 'avatar-circle-untrustworthy' ? index : null).filter(index => index !== null);
 			
-			// Create an array of labels, 50 for each party, and shuffle it
-			if (politicalManipulation == "political") {
-
-				for (let i = 0; i < 100; i++) {
-					const avatarCircle = $(`<div class='avatar-circle clickable ${politicalAffiliationArray[i]}' id='circle${randomizedAvatarNumberArray[i]}'></div>`);
-	
-					avatarCircleContainer.append(avatarCircle);
-					const circleId = $(`#circle${randomizedAvatarNumberArray[i]}`);
-					const avatarPhoto = $(`<img class='avatar-photo' src='./avatars/avatar${randomizedAvatarNumberArray[i]}.webp'>`);
-					circleId.append(avatarPhoto);
-				};
-
-			} else if (politicalManipulation == "nonpolitical") {
-				
-				for (let i = 0; i < 100; i++) {
-					const avatarCircle = $(`<div class='avatar-circle clickable avatar-circle-none' id='circle${randomizedAvatarNumberArray[i]}'></div>`);
-
-					avatarCircleContainer.append(avatarCircle);
-					const circleId = $(`#circle${randomizedAvatarNumberArray[i]}`);
-					const avatarPhoto = $(`<img class='avatar-photo' src='./avatars/avatar${randomizedAvatarNumberArray[i]}.webp'>`);
-					circleId.append(avatarPhoto);
-				}
+			// Create an array of labels, 50 trustworthy and 50 untrustworthy, and shuffle it
+			for (let i = 0; i < 100; i++) {
+				const avatarCircle = $(`<div class='avatar-circle clickable ${trustArray[i]}' id='circle${randomizedAvatarNumberArray[i]}'></div>`);
+			
+				avatarCircleContainer.append(avatarCircle);
+				const circleId = $(`#circle${randomizedAvatarNumberArray[i]}`);
+				const avatarPhoto = $(`<img class='avatar-photo' src='./avatars/avatar${randomizedAvatarNumberArray[i]}.webp'>`);
+				circleId.append(avatarPhoto);
 			};
 
 
@@ -291,7 +128,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 
 			trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
 
-			let avatarPoliticalAffiliations = [];
+			let avatarTrustworthiness = [];
 			let avatarSelections = [];
 			let avatarPositionIndices = [];
 			let avatarPositionXIndices = [];
@@ -306,47 +143,20 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			let sliderRatings = [];
 			let selectedSliderRatings = [];
 
-
-			let targetArrayDemocrat;
-			let targetArrayRepublican;
+			let targetArrayTrustworthy = selectionRatingsDict['trustworthy'] || [];
+			let targetArrayUntrustworthy = selectionRatingsDict['untrustworthy'] || [];
 			
-
+			
 			// this takes the number of the avatar (e.g., #12) and uses the number (1 to 100) as an index to retrieve the rating number at that
 			// "index" from the selectionRatings array's trial.trialIndex element. If the avatar is 12, then we actually are retrieving the 11th (12 - 1) index
-			// However, the problem is that trial.trialIndex is not what we want. The order is not always 0 to 4 Roentgen, Akon, Gandhi, Lovelace, Turing.
+			// However, the problem is that trial.trialIndex is not what we want. The order is not always 0 to 8.
 			for (let i = 0; i < randomizedAvatarNumberArray.length; i++) {
-				
-				switch (normManipulation) {
-					case "descriptive":
-						if (contributionManipulation == "dHigh_rLow") {
-							targetArrayDemocrat   = selectionRatingsDict['descriptiveDemocratHigh'];
-							targetArrayRepublican = selectionRatingsDict['descriptiveRepublicanLow'];
-						} else if (contributionManipulation == "rHigh_dLow") {
-							targetArrayDemocrat   = selectionRatingsDict['descriptiveDemocratLow'];
-							targetArrayRepublican = selectionRatingsDict['descriptiveRepublicanHigh'];
-						}
-						break;
-						
-					case "injunctive":
-						if (contributionManipulation == "dHigh_rLow") {
-							targetArrayDemocrat   = selectionRatingsDict['injunctiveDemocratHigh'];
-							targetArrayRepublican = selectionRatingsDict['injunctiveRepublicanLow'];
-						} else if (contributionManipulation == "rHigh_dLow") {
-							targetArrayDemocrat   = selectionRatingsDict['injunctiveDemocratLow'];
-							targetArrayRepublican = selectionRatingsDict['injunctiveRepublicanHigh'];
-						}
-						break;
-				};
-				
-				// if i is a democrat's index, push the jth index rating from the 50 democrat ratings
-
-				// if (politicalManipulation == "present") {
 				var yokedIndex = randomizedAvatarNumberArray[i] - 1; // this is the number of the avatar, already shuffled
-				if (democratAffiliationArray.includes(yokedIndex)) {
-					sliderRatings.push(targetArrayDemocrat.shift());
-				} else if (republicanAffiliationArray.includes(yokedIndex)) {
-					sliderRatings.push(targetArrayRepublican.shift());
-				};
+				if (trustworthyArray.includes(yokedIndex)) {
+					sliderRatings.push(targetArrayTrustworthy.shift());
+				} else if (untrustworthyArray.includes(yokedIndex)) {
+					sliderRatings.push(targetArrayUntrustworthy.shift());
+				}
 			};
 
 			var advanceButton = `<button class="jspsych-btn"><i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done</button>`
@@ -380,11 +190,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					id: `circle${avatarNumber}`
 				}).appendTo(avatarContainer);
 
-				if (politicalManipulation == "political") {
-					avatarCircleSelection.addClass(politicalAffiliationArray[randomizedAvatarNumberArray.indexOf(avatarNumber)]);
-				} else if (politicalManipulation == "nonpolitical") {
-					avatarCircleSelection.addClass('avatar-circle-none');
-				};
+				avatarCircleSelection.addClass(trustArray[randomizedAvatarNumberArray.indexOf(avatarNumber)]);
 
 				// Create copy of the chosen avatar photo
 				// Add it inside the avatar circle
@@ -393,14 +199,9 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					class: 'avatar-photo'
 				}).appendTo(avatarCircleSelection);
 
-				let ratingPrompt;
-				if (normManipulation == "descriptive") {
-					ratingPrompt = `Contribution amount: ${sliderRatings[avatarIndex]} points`;
-				} else if (normManipulation == "injunctive") {
-					ratingPrompt = `Preferred contribution amount: ${sliderRatings[avatarIndex]} points`;
-				};
-				const textDownRating = "0 points";
-				const textUpRating   = "500 points";
+				let ratingPrompt = `Contribution amount: ${sliderRatings[avatarIndex]} points`;
+				const textDownRating = "1";
+				const textUpRating   = "7";
 
 				const labelElement = $('<label>', {
 					for: "rating-slider",
@@ -412,8 +213,8 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					type: 'range',
 					class: 'jspsych-slider bipolar-clicked',
 					value: sliderRatings[avatarIndex],
-					min: 0,
-					max: 500,
+					min: 1,
+					max: 7,
 					step: 1,
 					id: 'rating-slider',
 					disabled: true
@@ -426,8 +227,8 @@ var jsPsychSelectionLearning = (function (jspsych) {
 				$(document).ready(function() {
 					const slider = $('#rating-slider');
 					slider.attr({
-						min: 0,
-						max: 500,
+						min: 1,
+						max: 7,
 						value: sliderRatings[avatarIndex]
 					}).trigger('input'); // Force re-rendering
 				});
@@ -561,7 +362,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					const clickHandler = function () {
 
 						let currentIndex; 
-						let politicalAffiliaton;
+						let Trustworthiness;
 
 						if (currentSelection !== avatarNumber) {
 							// <!-- Find actual index of the avatar --> //
@@ -569,11 +370,9 @@ var jsPsychSelectionLearning = (function (jspsych) {
 							selectedSliderRatings.push(sliderRatings[avatarIndex]); // Push selected slider rating to selections
 							currentSelection = avatarNumber; // Update current selection
 
-							if (politicalManipulation == "political") {
-								currentIndex = randomizedAvatarNumberArray.indexOf(currentSelection);
-								politicalAffiliaton = politicalAffiliationArray[currentIndex]
-								avatarPoliticalAffiliations.push(politicalAffiliaton);
-							};
+							currentIndex = randomizedAvatarNumberArray.indexOf(currentSelection);
+							Trustworthiness = trustArray[currentIndex]
+							avatarTrustworthiness.push(Trustworthiness);
 
 							// <!-- Find positional index of the avatar --> //
 							// Assuming you have an ID or a class for the parent div
@@ -615,14 +414,10 @@ var jsPsychSelectionLearning = (function (jspsych) {
 							};
 
 							$("#circle" + avatarNumber).css("background-color", "#bbb");  // Fades background color
-							if (politicalManipulation == "political") {
-								if (politicalAffiliationArray[currentIndex] == "avatar-circle-democrat") {
+							if (trustArray[currentIndex] == "avatar-circle-trustworthy") {
 									$("#circle" + avatarNumber).css("border-color", "rgba(1, 67, 202, 0.5)");
-								} else if (politicalAffiliationArray[currentIndex] == "avatar-circle-republican") {
+								} else if (trustArray[currentIndex] == "avatar-circle-untrustworthy") {
 									$("#circle" + avatarNumber).css("border-color", "rgba(232, 27, 35, 0.5)");
-								}
-							} else if (politicalManipulation == "nonpolitical") {
-								$("#circle" + avatarNumber).css("border-color", "rgba(0, 0, 0, 0.5)");
 							};
 							$("#circle" + avatarNumber).find("img.avatar-photo").css("opacity", "0.5");  // Fades avatar photo
 							initLearning(avatarIndex, avatarNumber);  // Start trial
@@ -655,9 +450,9 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					"avatar_position_indices": avatarPositionIndices.join(','),
 					"avatar_position_x_indices": avatarPositionXIndices.join(','),
 					"avatar_position_y_indices": avatarPositionYIndices.join(','),
-					"all_political_avatars": politicalAffiliationArray,
-					"democrat_avatars": democratAffiliationArray,
-					"republican_avatars": republicanAffiliationArray,
+					"all_avatars": trustArray,
+					"trustworthy_avatars": trustworthyArray,
+					"untrustworthy_avatars": untrustworthyArray,
 					"selected_slider_ratings": selectedSliderRatings,
 					"click_rt_array": clickRtArray.join(','),
 					"view_rt_array": viewRtArray.join(','),
