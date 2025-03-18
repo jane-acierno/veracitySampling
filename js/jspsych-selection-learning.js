@@ -199,7 +199,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					class: 'avatar-photo'
 				}).appendTo(avatarCircleSelection);
 
-				let ratingPrompt = `Contribution amount: ${sliderRatings[avatarIndex]} points`;
+				let ratingPrompt = `Belief rating: ${sliderRatings[avatarIndex]}/7 belivability`;
 				const textDownRating = "1";
 				const textUpRating   = "7";
 
