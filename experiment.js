@@ -42,7 +42,7 @@ const valueOpinionOptions = ['Yes', 'Somewhat', 'No'];
 const beliefOptions = ['Definitely false', '', '', '', '','', 'Defintely True'];
 
 // Statements
-const statement = [
+const statements = [
   `"You can test positive for HPV as a result of receiving the HPV vaccine."`,
   `"Vaccines can cause sudden infant death syndrome (SIDS)."`,
   `"The chickenpox vaccine can cause infertility."`,
@@ -167,7 +167,7 @@ const preBelief = {
   preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
-    prompt: `<blockquote>${statement[index]}</blockquote>`,
+    prompt: `<blockquote>${statements[index]}</blockquote>`,
     options: ["Strongly Disagree","","","","","","Strongly Agree"],
     required: true,
     horizontal: true,
@@ -265,20 +265,19 @@ const preSamplingInstructions = {
 timeline.push(preSamplingInstructions);
 
 
-function selectionTask(trialIndex, epistemicMoralCondition) {
+function selectionTask(trialIndex) {
   return {
     type: jsPsychSelectionLearning,
     trialIndex: trialIndex,
     avatars: avatarDictionary,
     // epistemicMoralCondition: epistemicMoralCondition,
-    statement: statement[trials[trialIndex]],
+    statement: statements[trials[trialIndex]],
     choices: [
       "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;Continue sampling",
       "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done"
     ]
   };
 };
-
 
 const avatarNames = Array.from({ length: 100 }, (_, i) => "avatar" + i);
 const avatarPhotos = Array.from({ length: 100 }, (_, i) => `./avatars/avatar${i + 1}.webp`);
@@ -290,13 +289,15 @@ for (let i = 0; i < 100; i++) {
   avatarDictionary[avatarNames[i + 1]] = avatarData;
 
   let avatarName = 'image' + i;
-  let avatar = avatarDictionary[avatarNames[i + 1]].image;
+  let avatar = avatarDictionary[avatarNames[i + 1]].image; 
 
   selectionTask = Object.assign(selectionTask, { [avatarName]: avatar });
 };
 
 // Sampling Task
-timeline.push(selectionTask())
+for (let i = 0; i < trials.length; i++) {
+  timeline.push(selectionTask(i)); 
+}
 
 // Post-sampling belief ratings for only the selected trials
 const postBelief = {
@@ -304,7 +305,7 @@ const postBelief = {
   preamble: `<p><strong>Now, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
-    prompt: `<blockquote>${statement[index]}</blockquote>`,
+    prompt: `<blockquote>${statements[index]}</blockquote>`,
     options: ["Strongly Disagree","","","","","","Strongly Agree"],
     required: true,
     horizontal: true,
