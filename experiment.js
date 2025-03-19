@@ -294,9 +294,17 @@ for (let i = 0; i < 100; i++) {
   selectionTask = Object.assign(selectionTask, { [avatarName]: avatar });
 };
 
+const blankPage = {
+  type: jsPsychHtmlKeyboardResponse,
+  stimulus: '',
+  choices: "NO_KEYS",
+  trial_duration: 200
+};
+
 // Sampling Task
 for (let i = 0; i < trials.length; i++) {
   timeline.push(selectionTask(i)); 
+  timeline.push(blankPage);
 }
 
 // Post-sampling belief ratings for only the selected trials
