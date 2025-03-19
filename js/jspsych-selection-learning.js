@@ -458,6 +458,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					"view_rt_array": viewRtArray.join(','),
 					"task_duration": taskDuration
 				};
+				// console.log("Ending trial with data:", trial_data); // Comment this back in for debugging
 				jsPsych.finishTrial(trial_data);
 			};
 		};
