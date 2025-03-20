@@ -208,24 +208,6 @@ const preBelief = {
   }
 };
 
-
-
-
-// // USE THIS INSTEAD IF PARTICIAPNTS SHOULD RATE ALL 18 STATEMENTS, NOT JUST THE ONES THEY'LL SAMPLE FOR
-// const preBelief = {
-//   type: jsPsychSurveyMultiChoice,
-//   preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
-//   questions: statement.map((statement, index) => ({
-//     name: `preBelief${index + 1}`,
-//     prompt: `<blockquote>${statement}</blockquote>`,
-//     options: ["Strongly Disagree","","","","","","Strongly Agree"],
-//     required: true,
-//     horizontal: true,
-//   })),
-//   randomize_question_order: true
-// };
-
-
 // Pre-sampling belief
 timeline.push(preBelief);
 
@@ -251,7 +233,7 @@ const preIntInstructions = {
 timeline.push(preIntInstructions);
 
 // Intervention //
-// I changed image sizing to improve the look of the page & added 5 second delay to force reading
+// Added 5 second delay to force reading
 const InterventionImage = {
   type: jsPsychInstructions,
   pages: [`
@@ -309,7 +291,7 @@ if (expcondition === 'treatment') {
 
 
 // Sampling instructions //
-//Added 5 second delay to force reading
+// Added 5 second delay to force reading
 const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
@@ -374,12 +356,13 @@ for (let i = 0; i < 100; i++) {
 
   selectionTask = Object.assign(selectionTask, { [avatarName]: avatar });
 };
+
 // Blank page to avoid issues with sampling task
 const blankPage = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: '',
   choices: "NO_KEYS",
-  trial_duration: 20 // reduced time to 20ms as still seems to work
+  trial_duration: 20 // should test to make sure this is enough on other computers as well
 };
 
 // Sampling Task
@@ -1051,14 +1034,15 @@ const exitFullscreen = {
 timeline.push(exitFullscreen);
 
 // Choose from among these to relay via DataPipe
-const preregisteredExperimentId = "jWr5Nul5HYl2";
+const preregisteredExperimentId = "jWr5Nul5HYl2"; 
 const debugExperimentId = "XyR978iH6AOX";
 
 // DataPipe conclude data collection
 const save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: debugExperimentId,
+  experiment_id: "pTWSMZwhLgng",
+  //experiment_id: debugExperimentId, 
   filename: filename,
   data_string: () => jsPsych.data.get().csv(),
   on_finish: function (data) {
@@ -1077,7 +1061,7 @@ const save_data = {
 
     const results = jsPsych.data.get().csv();
     jsPsych.endExperiment(
-      //  Removed for now, will hadd back     Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
+      //  Removed for now, will add back     Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
       `<p class="jspsych-center">
       </p>
       <pre>${results}</pre>` //Check results
