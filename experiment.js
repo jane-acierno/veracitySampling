@@ -20,8 +20,15 @@ const sessionId = jsPsych.data.getURLVariable('SESSION_ID');
 // Treatment vs. Control
 const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment', 'control'], 1)[0];
 
-// Random assignment of statements: pick 5 of 18 statements
-const trials = jsPsych.randomization.shuffle([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]).slice(0, 5);
+// Define the false and true statements such that first 9 are false, and last 9 are true 
+// This is consistent with the order in the statements array
+const falseStatements = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+const trueStatements = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+// Randomly sample 3 false and 3 true statements without replacement. 
+const sampledFalseStatements = jsPsych.randomization.sampleWithoutReplacement(falseStatements, 3);
+const sampledTrueStatements = jsPsych.randomization.sampleWithoutReplacement(trueStatements, 3);
+// Shuffle order of statements
+const trials = jsPsych.randomization.shuffle([...sampledFalseStatements, ...sampledTrueStatements]);
 
 
 jsPsych.data.addProperties({
@@ -93,62 +100,64 @@ const enterFullscreen = {
 
 timeline.push(enterFullscreen)
 
-// CONSENT FORM //
+// CONSENT FORM - updated to html to force response as I couldn't make the force response to work//
 const consentForm = {
-  type: jsPsychSurveyMultiChoice,
-  questions: [
-    {
-      name: 'consent',
-      prompt: `
-            <p style="text-align: left;">
-              We would like to invite you to take part in an online research project. 
-              The purpose of this research is to investigate how people process health information. 
-            </p>
-            <p style="text-align: left;">
-            <ul>
-              <li>You must be at least 18 years old to take part in this research.</li>
-              <li>The study will take approximately 3-4 minutes to complete.</li>
-              <li>You will receive $0.70 for your participation in the study.</li>
-              <li>The possible risks or discomforts of the study are minimal. You may feel uncomfortable reflecting on and answering some questions.</li>
-              <li>There are no direct benefits for participating in the study.</li>
-              <li>Your part in this study will be handled in a confidential manner. 
-              Only the researchers will know that you participated in this study. 
-              Any reports or publications based on this research will use only group data and will not identify you or any individual as being part of this project. 
-              The only individually-identifying data we receive from Prolific are your unique identifier and your country.</li>
-              <li>The decision to participate in this research project is up to you. You do not have to participate.</li>
-              <li>Even if you begin the study, you may withdraw at any time. If you do not complete the survey submission, you will not be paid.</li>
-            </ul>
-            </p>
-            <p style="text-align: left;">
-              If you have any questions regarding electronic privacy, please feel free to contact Northeastern University’s 
-              Office of Information Security via phone at 617-373-7901, or via email at <a href="mailto:privacy@neu.edu">privacy@neu.edu</a>.
-            </p>
-            <p style="text-align: left;">
-              If you have any questions about this study, please feel free to contact the Principal Investigator 
-              Briony Swire-Thompson at b.swire-thompson@northeastern.edu; the person mainly responsible for the research. 
-              If you have any questions about your rights as a research subject, you can contact Northeastern University’s 
-              Office of Human Subject Research Protection at irb@neu.edu or 617-373-4588. You may call anonymously if you wish.
-            </p>
-            <p style="text-align: left;">
-              This study has been reviewed and approved by the Northeastern University Institutional Review Board (#20-12-16).
-            </p>
-            <p style="text-align: left;">
-              <b>If you do not wish to consent, please exit this website now.</b>
-            </p>
-            <p style="text-align: left;">
-            By clicking on the “Consent given” button below you are indicating that you consent to participate in this study. 
-            Please print out a copy of this consent screen or download a copy of the consent form for your records.
-            </p>`,
-      options: ["Consent not given", "Consent given"],
-      horizontal: true,
-      required: true
-    }
-  ],
+  type: jsPsychSurveyHtmlForm,
   preamble: '<h2 style="text-align: center"><strong>Request to Participate in Research</strong></h2>',
-
-  // If the participant does not consent, end the experiment
+  html: `
+    <div style="text-align: left; max-width: 800px; margin: auto;">
+      <p>
+        We would like to invite you to take part in an online research project. 
+        The purpose of this research is to investigate how people process health information. 
+      </p>
+      <ul style="list-style-position: outside; padding-left: 20px;">
+        <li>You must be at least 18 years old to take part in this research.</li>
+        <li>The study will take approximately 3-4 minutes to complete.</li>
+        <li>You will receive $0.70 for your participation in the study.</li>
+        <li>The possible risks or discomforts of the study are minimal. You may feel uncomfortable reflecting on and answering some questions.</li>
+        <li>There are no direct benefits for participating in the study.</li>
+        <li>Your part in this study will be handled in a confidential manner. 
+        Only the researchers will know that you participated in this study. 
+        Any reports or publications based on this research will use only group data and will not identify you or any individual as being part of this project. 
+        The only individually-identifying data we receive from Prolific are your unique identifier and your country.</li>
+        <li>The decision to participate in this research project is up to you. You do not have to participate.</li>
+        <li>Even if you begin the study, you may withdraw at any time. If you do not complete the survey submission, you will not be paid.</li>
+      </ul>
+      <p>
+        If you have any questions regarding electronic privacy, please feel free to contact Northeastern University’s 
+        Office of Information Security via phone at 617-373-7901, or via email at <a href="mailto:privacy@neu.edu">privacy@neu.edu</a>.
+      </p>
+      <p>
+        If you have any questions about this study, please feel free to contact the Principal Investigator 
+        Briony Swire-Thompson at <a href="mailto:b.swire-thompson@northeastern.edu">b.swire-thompson@northeastern.edu</a>; the person mainly responsible for the research. 
+        If you have any questions about your rights as a research subject, you can contact Northeastern University’s 
+        Office of Human Subject Research Protection at <a href="mailto:irb@neu.edu">irb@neu.edu</a> or 617-373-4588. You may call anonymously if you wish.
+      </p>
+      <p>
+        This study has been reviewed and approved by the Northeastern University Institutional Review Board (#20-12-16).
+      </p>
+      <p><b>If you do not wish to consent, please exit this website now.</b></p>
+      <p>
+        By clicking on the “Consent given” button below you are indicating that you consent to participate in this study. 
+        Please print out a copy of this consent screen or download a copy of the consent form for your records.
+      </p>
+      <p style="text-align: center;">
+        <label style="margin-right: 20px;">
+          <input type="radio" name="consent" value="Consent given" required> Consent given
+        </label>
+        <label>
+          <input type="radio" name="consent" value="Consent not given"> Consent not given
+        </label>
+      </p>
+    </div>
+  `,
   on_finish: function (data) {
-    if (jsPsych.data.get().last(1).values()[0].response.consent == "Consent not given") {
+    const response = data.response.consent;
+    if (!response) {
+      alert("You must select an option to proceed.");
+      return false; // Prevents moving forward
+    }
+    if (response === "Consent not given") {
       jsPsych.endExperiment(
         `<p class="jspsych-center">
           You did not consent to participate in this study.<br>
@@ -162,6 +171,8 @@ const consentForm = {
 timeline.push(consentForm);
 
 // Pre-sampling belief ratings for only the selected trials
+// added a scroll to top function to ensure the page starts at the top (added to all pages)
+// Disable next button until all questions are answered
 const preBelief = {
   type: jsPsychSurveyMultiChoice,
   preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
@@ -172,8 +183,31 @@ const preBelief = {
     required: true,
     horizontal: true,
   })),
-  randomize_question_order: true
+  randomize_question_order: true,
+  on_load: function() {
+    window.scrollTo(0, 0);
+    const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
+    nextButton.disabled = true;
+
+    const checkResponses = () => {
+      const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
+      let allAnswered = true;
+      responses.forEach(response => {
+        const options = response.querySelectorAll('input[type="radio"]');
+        const answered = Array.from(options).some(option => option.checked);
+        if (!answered) {
+          allAnswered = false;
+        }
+      });
+      nextButton.disabled = !allAnswered;
+    };
+
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', checkResponses);
+    });
+  }
 };
+
 
 
 
@@ -206,34 +240,61 @@ const preIntInstructions = {
         On the next page you will receive some additional information.
         Please read the information carefully before continuing.
         </p>`
-  ],
-  show_clickable_nav: true,
-};
+      ],
+      show_clickable_nav: true,
+      on_load: function() {
+        window.scrollTo(0, 0);
+      }
+    };
 
 // Pre-intervention instructions
 timeline.push(preIntInstructions);
 
 // Intervention //
+// I changed image sizing to improve the look of the page & added 5 second delay to force reading
 const InterventionImage = {
   type: jsPsychInstructions,
   pages: [`
-        <p style="text-align: left;">
-          <img src="intervention/intervention.webp" alt="Intervention Image" style="width: 100%;"/>
+        <p style="text-align: center;">
+          <img src="intervention/intervention.webp" alt="Intervention Image" style="width: 65%; height: 65%;"/>
         </p>`
   ],
   show_clickable_nav: true,
+  on_load: function() {
+    window.scrollTo(0, 0);
+    // Disable the "Next" button initially
+    const nextButton = document.querySelector('#jspsych-instructions-next');
+    if (nextButton) {
+      nextButton.disabled = true;
+      setTimeout(() => {
+        nextButton.disabled = false;
+      }, 5000);
+    }
+  }
 };
 
 // Control //
 const ControlImage = {
   type: jsPsychInstructions,
   pages: [`
-        <p style="text-align: left;">
-          <img src="intervention/control.webp" alt="Control Image" style="width: 100%;"/>
+        <p style="text-align: center;">
+          <img src="intervention/control.webp" alt="Control Image" style="width: 65%; height: 65%"/>
         </p>`
   ],
   show_clickable_nav: true,
+  on_load: function() {
+    window.scrollTo(0, 0);
+    // Disable the "Next" button initially
+    const nextButton = document.querySelector('#jspsych-instructions-next');
+    if (nextButton) {
+      nextButton.disabled = true;
+      setTimeout(() => {
+        nextButton.disabled = false;
+      }, 5000);
+    }
+  }
 };
+
 
 // Receive intervention or control
 if (expcondition === 'treatment') {
@@ -248,6 +309,7 @@ if (expcondition === 'treatment') {
 
 
 // Sampling instructions //
+//Added 5 second delay to force reading
 const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
@@ -258,29 +320,48 @@ const preSamplingInstructions = {
         thought the claim above was true or false. You can view the opinions 
         of as many people as you would like before moving on.
         </p>`
-  ],
-  show_clickable_nav: true,
+      ],
+      show_clickable_nav: true,
+      on_load: function() {
+        window.scrollTo(0, 0);
+
+    // Disable the "Next" button initially
+    const nextButton = document.querySelector('#jspsych-instructions-next');
+    if (nextButton) {
+      nextButton.disabled = true;
+      setTimeout(() => {
+        nextButton.disabled = false;
+      }, 5000);
+    }
+  }
 };
 
 timeline.push(preSamplingInstructions);
+    
+    
+    function selectionTask(trialIndex) {
+      const statementIndex = trials[trialIndex];
+      const isTrueStatement = statementIndex >= 9; // False statements are inxed from 0 to 8, True statements are indexed from 9 to 17
+    
+      return {
+        type: jsPsychSelectionLearning,
+        trialIndex: trialIndex,
+        avatars: avatarDictionary,
+        statement: statements[statementIndex],
+        isTrueStatement: isTrueStatement, // Added to indicate if the statement is true or false
+        choices: [
+          "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;Continue sampling",
+          "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done"
+        ],
+        on_load: function() {
+          window.scrollTo(0, 0);
+        }
+      };
+    };
+    
 
-
-function selectionTask(trialIndex) {
-  return {
-    type: jsPsychSelectionLearning,
-    trialIndex: trialIndex,
-    avatars: avatarDictionary,
-    // epistemicMoralCondition: epistemicMoralCondition,
-    statement: statements[trials[trialIndex]],
-    choices: [
-      "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;Continue sampling",
-      "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done"
-    ]
-  };
-};
-
-const avatarNames = Array.from({ length: 100 }, (_, i) => "avatar" + i);
-const avatarPhotos = Array.from({ length: 100 }, (_, i) => `./avatars/avatar${i + 1}.webp`);
+    const avatarNames = Array.from({ length: 100 }, (_, i) => "avatar" + i);
+    const avatarPhotos = Array.from({ length: 100 }, (_, i) => `./avatars/avatar${i + 1}.webp`);
 
 let avatarDictionary = {};
 
@@ -293,12 +374,12 @@ for (let i = 0; i < 100; i++) {
 
   selectionTask = Object.assign(selectionTask, { [avatarName]: avatar });
 };
-
+// Blank page to avoid issues with sampling task
 const blankPage = {
   type: jsPsychHtmlKeyboardResponse,
   stimulus: '',
   choices: "NO_KEYS",
-  trial_duration: 200
+  trial_duration: 20 // reduced time to 20ms as still seems to work
 };
 
 // Sampling Task
@@ -308,6 +389,7 @@ for (let i = 0; i < trials.length; i++) {
 }
 
 // Post-sampling belief ratings for only the selected trials
+// Still having issues with required response
 const postBelief = {
   type: jsPsychSurveyMultiChoice,
   preamble: `<p><strong>Now, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
@@ -318,7 +400,27 @@ const postBelief = {
     required: true,
     horizontal: true,
   })),
-  randomize_question_order: true
+  randomize_question_order: true,
+  on_load: function () {
+    window.scrollTo(0, 0);
+
+    const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
+    if (nextButton) {
+      nextButton.disabled = true;
+
+      const checkResponses = () => {
+        const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
+        let allAnswered = Array.from(responses).every(response => 
+          Array.from(response.querySelectorAll('input[type="radio"]')).some(option => option.checked)
+        );
+        nextButton.disabled = !allAnswered;
+      };
+
+      document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', checkResponses);
+      });
+    }
+  }
 };
 
 // Post-sampling belief
@@ -750,8 +852,11 @@ const demographicsQuestions = {
           }
         </style>
       `,
-  button_label: 'Next',
-  request_response: true,
+      button_label: 'Next',
+      request_response: true, // We should require response
+      on_load: function() {
+        window.scrollTo(0, 0);
+      },
   on_finish: function (data) {
     let demographicsData = data.response;
 
@@ -828,9 +933,12 @@ const politicsQuestions = {
         <p class="jspsych-survey-multi-choice-preamble">
           Please answer the following questions about your political ideology:
         </p>`,
-  request_response: true,
-  on_finish: function (data) {
-    let politicalData = data.response;
+        request_response: true, // We should require response
+        on_load: function() {
+          window.scrollTo(0, 0);
+        },
+        on_finish: function (data) {
+          let politicalData = data.response;
 
     politicalData = {
       political_ideology_economic: politicalData['political-ideology-economic'],
@@ -870,13 +978,16 @@ const demandEffectsQuestions = {
     }
   ],
   randomize_question_order: true,
-  request_response: true,
+  request_response: true, // We should require response
   scale_width: 500,
   preamble:
     `<p class="jspsych-survey-multi-choice-preamble">
         For these final questions, please answer as honestly as you can.
         The answers to these questions will <strong>not</strong> affect whether or not you receive credit/payment for participation!
       </p>`,
+      on_load: function() {
+        window.scrollTo(0, 0);
+      },
   on_finish: function (data) {
     let demandEffectsData = data.response;
 
@@ -911,6 +1022,9 @@ const feedback = {
       rows: 10
     }
   ],
+  on_load: function() {
+    window.scrollTo(0, 0);
+  },
   on_finish: function (data) {
     let purposeFeedbackData = data.response;
 
@@ -961,14 +1075,18 @@ const save_data = {
 
     countdown(5, 0);
 
+    const results = jsPsych.data.get().csv();
     jsPsych.endExperiment(
+      //  Removed for now, will hadd back     Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
       `<p class="jspsych-center">
-        Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
-      </p>`
+      </p>
+      <pre>${results}</pre>` //Check results
     );
-    setTimeout(function () {
-      window.location.href = "https://app.prolific.com/submissions/complete?cc=CNN3F4P4";
-    }, 5000)
+
+    // Commenting out the redirection for now
+    // setTimeout(function () {
+    //   window.location.href = "https://app.prolific.com/submissions/complete?cc=CNN3F4P4";
+    // }, 5000);
   }
 };
 

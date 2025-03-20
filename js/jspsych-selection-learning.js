@@ -54,24 +54,30 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					<div class="grid-container" id="avatar-grid"></div>
 				</div>`;
 
+// Function to sample from a normal distribution and truncate the values
+function sampleNormal(mean, stdDev, min, max) {
+    let u = 0, v = 0;
+    while (u === 0) u = Math.random(); // Converting [0,1) to (0,1)
+    while (v === 0) v = Math.random();
+    let num = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+    num = num * stdDev + mean; // Transform to the desired mean and standard deviation
+	num = Math.max(min, Math.min(max, num)); // Truncate to the range [min, max]
+    return Math.round(num); // Round to the nearest whole number
+}
 
-			// Pre-Shuffled Ratings
-			// Trustworthy vs. Untrustworthy
-			const selectionRatingsDict = {
-				trustworthy: jsPsych.randomization.shuffle([
-					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
-					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
-					7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 
-					7, 7, 7, 7, 7, 7, 7
-				]),
-
-				untrustworthy: jsPsych.randomization.shuffle([
-					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-					1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
-					1, 1, 1, 1, 1, 1, 1
-				]),
-			};
+// Set trustworthy and untrustworthy ratings based on whether the statement is true (defined in experiment.js)
+let selectionRatingsDict;
+if (trial.isTrueStatement) {
+    selectionRatingsDict = {
+        trustworthy: new Array(50).fill(7).map(() => sampleNormal(7, 1.2, 1, 7)),
+        untrustworthy: new Array(50).fill(1).map(() => sampleNormal(1, 1.2, 1, 7)),
+    };
+} else {
+    selectionRatingsDict = {
+        trustworthy: new Array(50).fill(1).map(() => sampleNormal(1, 1.2, 1, 7)),
+        untrustworthy: new Array(50).fill(7).map(() => sampleNormal(7, 1.2, 1, 7)),
+    };
+}
 
 			// Initialize trial presentation space
 			const trialPresentationSpace = $('#trial-presentation-space');
@@ -79,45 +85,67 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			// Generate circles
 			const avatarCircleContainer = $('#avatar-grid');
 
-			// Avatar NUMBER randomized from 1 to 100; not index 0 to 99
-			// EXAMPLE: [1, 3, 2, ..., 100]
-			const randomizedAvatarNumberArray = jsPsych.randomization.shuffle([...Array(100).keys()].map (x => x + 1));
+			// Avatar NUMBER from 1 to 100; not index 0 to 99
+			const avatarNumberArray = [...Array(100).keys()].map(x => x + 1);
 
-			let trustArray;
-			let trustworthyArray;
-			let untrustworthyArray;
+			 // Combine trustworthy and untrustworthy arrays
+			let combinedTrustArray = new Array(50).fill('avatar-circle-trustworthy').concat(new Array(50).fill('avatar-circle-untrustworthy'));
 
-			// Create an array populated with either 'avatar-circle-trustworthy' or 'avatar-circle-untrustworthy' depending on index
-			// EXAMPLE: ['avatar-circle-trustworthy', 'avatar-circle-trustworthy', 'avatar-circle-untrustworthy', ..., 'avatar-circle-trustworthy']
-			trustArray = jsPsych.randomization.shuffle(
-				new Array(50).fill('avatar-circle-trustworthy').concat(new Array(50).fill('avatar-circle-untrustworthy'))
-			);
+			// Shuffle the combined array
+			function shuffleArray(array) {
+				for (let i = array.length - 1; i > 0; i--) {
+					const j = Math.floor(Math.random() * (i + 1));
+					[array[i], array[j]] = [array[j], array[i]];
+				}
+				return array;
+			}
 
-			// Split into two arrays: 50 for trustworthy
-			// EXAMPLE: [0, 2, 4, ..., 98]
-			// Get the indices of 'avatar-circle-trustworthy'
-			trustworthyArray = trustArray.map((affiliation, index) => affiliation === 'avatar-circle-trustworthy' ? index : null).filter(index => index !== null);
+			combinedTrustArray = shuffleArray(combinedTrustArray);
 
-			// ...and 50 for untrustworthy
-			// EXAMPLE: [1, 3, 5, ..., 99]
-			untrustworthyArray = trustArray.map((affiliation, index) => affiliation === 'avatar-circle-untrustworthy' ? index : null).filter(index => index !== null);
+			combinedTrustArray = shuffleArray(combinedTrustArray); // Shuffle twice to increase randomness
+
+			// Define trustworthy and untrustworthy labels - are these what we want to go with?
+			const untrustworthyLabels = [
+				'Chiropractor', 'Naturopath', 'Homeopath', 'Herbalist', 'Osteopath',
+				'Acupuncturist', 'Reiki practitioner', 'Kinesiologist',
+				'Hypnotherapist', 'Sound healer'
+			];
 			
-			// Create an array of labels, 50 trustworthy and 50 untrustworthy, and shuffle it
+			const trustworthyLabels = [
+				'Primary care physician', 'Urgent care doctor', 'Nurse', 'Pharmacist',
+				'Physiotherapist', 'Cardiologist', 'Dermatologist', 'Ophthalmologist',
+				'Oncologist', 'Neurologist'
+			];
+			
+			// Create a random array of labels, 50 trustworthy and 50 untrustworthy
+			let avatarLabels = [];
 			for (let i = 0; i < 100; i++) {
-				const avatarCircle = $(`<div class='avatar-circle clickable ${trustArray[i]}' id='circle${randomizedAvatarNumberArray[i]}'></div>`);
+				let trustworthinessLabel;
+				if (combinedTrustArray[i] === 'avatar-circle-trustworthy') {
+					trustworthinessLabel = trustworthyLabels[Math.floor(Math.random() * trustworthyLabels.length)];
+				} else {
+					trustworthinessLabel = untrustworthyLabels[Math.floor(Math.random() * untrustworthyLabels.length)];
+				}
+				avatarLabels.push(trustworthinessLabel);
+				const avatarCircleWrapper = $(`<div class='avatar-circle-wrapper'></div>`);
+				const avatarCircle = $(`<div class='avatar-circle clickable ${combinedTrustArray[i]}' id='circle${avatarNumberArray[i]}'></div>`);
+				avatarCircleWrapper.append(avatarCircle);
+				avatarCircleContainer.append(avatarCircleWrapper);
+				const avatarPhoto = $(`<img class='avatar-photo' src='./avatars/avatar${avatarNumberArray[i]}.webp'>`);
+				const label = $(`<div class='trustworthiness-label'>${trustworthinessLabel}</div>`);
+				avatarCircle.append(avatarPhoto);
+				avatarCircleWrapper.append(label);
+			}
 			
-				avatarCircleContainer.append(avatarCircle);
-				const circleId = $(`#circle${randomizedAvatarNumberArray[i]}`);
-				const avatarPhoto = $(`<img class='avatar-photo' src='./avatars/avatar${randomizedAvatarNumberArray[i]}.webp'>`);
-				circleId.append(avatarPhoto);
-			};
-
-
+			// Define trustworthyArray and untrustworthyArray
+			const trustworthyArray = combinedTrustArray.filter(trust => trust === 'avatar-circle-trustworthy');
+			const untrustworthyArray = combinedTrustArray.filter(trust => trust === 'avatar-circle-untrustworthy');
+			
 			// Pt. 3: Prompt
 			const samplingPromptContainer = $('#prompt-container');
 			samplingPromptContainer.html(`
 				<strong id="samplingPrompt" style="text-transform: uppercase;">
-					click on the person whose opinion you would like to view next	
+					click on the person whose opinion you would like to view next    
 				</strong>
 				<br>
 				<span style="text-transform: uppercase;">
@@ -125,7 +153,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 				</span>
 				<br>`
 			);
-
+			
 			trial.button_html = trial.button_html || '<button class="jspsych-btn">%choice%</button>';
 
 			let avatarTrustworthiness = [];
@@ -143,18 +171,14 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			let sliderRatings = [];
 			let selectedSliderRatings = [];
 
-			let targetArrayTrustworthy = selectionRatingsDict['trustworthy'] || [];
-			let targetArrayUntrustworthy = selectionRatingsDict['untrustworthy'] || [];
-			
-			
-			// this takes the number of the avatar (e.g., #12) and uses the number (1 to 100) as an index to retrieve the rating number at that
-			// "index" from the selectionRatings array's trial.trialIndex element. If the avatar is 12, then we actually are retrieving the 11th (12 - 1) index
-			// However, the problem is that trial.trialIndex is not what we want. The order is not always 0 to 8.
-			for (let i = 0; i < randomizedAvatarNumberArray.length; i++) {
-				var yokedIndex = randomizedAvatarNumberArray[i] - 1; // this is the number of the avatar, already shuffled
-				if (trustworthyArray.includes(yokedIndex)) {
+			let targetArrayTrustworthy = selectionRatingsDict['trustworthy'];
+			let targetArrayUntrustworthy = selectionRatingsDict['untrustworthy'];
+
+			// Use target array not random avatar array
+			for (let i = 0; i < combinedTrustArray.length; i++) {
+				if (combinedTrustArray[i] === 'avatar-circle-trustworthy') {
 					sliderRatings.push(targetArrayTrustworthy.shift());
-				} else if (untrustworthyArray.includes(yokedIndex)) {
+				} else {
 					sliderRatings.push(targetArrayUntrustworthy.shift());
 				}
 			};
@@ -174,39 +198,54 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			const initLearning = (avatarIndex, avatarNumber) => {
 				// RT: START STOPWATCH (VIEW)
 				let viewTic = (new Date()).getTime();
-
+			
 				$('#overlay').fadeIn();
 				trialPresentationSpace.empty();
 				trialPresentationSpace.fadeIn();
-
+			
 				const trialFormat     = $(`<div id="trial-format"></div>`);
 				const trialFeedback   = $(`<div id="selection-buttons"></div>`);
 				const avatarContainer = $('<div id="avatar-container"></div>')
-
+			
 				// Create a new circle to hold the chosen avatar
 				// Add it to the presentation space
 				const avatarCircleSelection = $('<div></div>', {
-					class: 'avatar-circle',
+					class: 'avatar-circle-wrapper',
 					id: `circle${avatarNumber}`
 				}).appendTo(avatarContainer);
-
-				avatarCircleSelection.addClass(trustArray[randomizedAvatarNumberArray.indexOf(avatarNumber)]);
-
+			
+				const avatarCircle = $('<div></div>', {
+					class: 'avatar-circle',
+					id: `circle${avatarNumber}`
+				}).appendTo(avatarCircleSelection);
+			
+				avatarCircle.addClass(combinedTrustArray[avatarNumberArray.indexOf(avatarNumber)]);
+			
 				// Create copy of the chosen avatar photo
 				// Add it inside the avatar circle
 				$('<img>', {
 					src: `./avatars/avatar${avatarNumber}.webp`,
 					class: 'avatar-photo'
-				}).appendTo(avatarCircleSelection);
-
+				}).appendTo(avatarCircle);
+			
+				// Remove the trustworthiness label
+				// const trustworthinessLabel = combinedTrustArray[avatarNumberArray.indexOf(avatarNumber)] === 'avatar-circle-trustworthy' ? 'Trustworthy' : 'Untrustworthy';
+				// const label = $(`<div class='trustworthiness-label'>${trustworthinessLabel}</div>`);
+				// avatarCircleSelection.append(label);
+			
+				// Add the specific label for the avatar, ensuring it matches the label in the grid
+				const specificLabel = avatarLabels[avatarNumberArray.indexOf(avatarNumber)];
+				const specificLabelElement = $(`<div class='specific-label'>${specificLabel}</div>`);
+				avatarCircleSelection.append(specificLabelElement);
+			
 				let ratingPrompt = `Belief rating: ${sliderRatings[avatarIndex]}/7 belivability`;
 				const textDownRating = "1";
 				const textUpRating   = "7";
-
+			
 				const labelElement = $('<label>', {
 					for: "rating-slider",
 				}).text(ratingPrompt);
-
+			
 				// Step 1: Create the input element with initial attributes
 				const inputElement = $('<input>', {
 					name: 'rating-slider',
@@ -219,10 +258,10 @@ var jsPsychSelectionLearning = (function (jspsych) {
 					id: 'rating-slider',
 					disabled: true
 				});
-
+			
 				// Step 2: Append the slider to the DOM
 				$('#slider-container').append(inputElement); // Adjust to actual container
-
+			
 				// Step 3: Reapply attributes and trigger input after DOM is ready
 				$(document).ready(function() {
 					const slider = $('#rating-slider');
@@ -232,7 +271,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 						value: sliderRatings[avatarIndex]
 					}).trigger('input'); // Force re-rendering
 				});
-
+			
 				const sliderRating = $('<div>', {
 					style: 'position: relative;'
 				}).append(
@@ -252,36 +291,35 @@ var jsPsychSelectionLearning = (function (jspsych) {
 						})
 					)
 				);
-				
-
+			
 				trialFormat.append(avatarContainer, sliderRating);
 				trialPresentationSpace.html(`<div></div>`);
 				trialPresentationSpace.append(trialFormat);
-
+			
 				samplingPromptContainer.empty();
 				avatarCircleContainer.addClass('fade-out-partial');
-
+			
 				setTimeout(function () {
 					let buttons = [];
 					if (Array.isArray(trial.button_html)) {
 						if (trial.button_html.length == trial.choices.length) {
 							buttons = trial.button_html;
-						};
+						}
 					} else {
 						for (let i = 0; i < trial.choices.length; i++) {
 							buttons.push(trial.button_html);
-						};
-					};
+						}
+					}
 					trialPresentationSpace.html(trialFormat);
-
+			
 					trialFeedback.html(`
 						<hr></hr>
 						<p>Would you like to continue sampling?</p>
 						<div id="jspsych-selection-learning-btngroup" class="center-content block-center"></div>`
 					);
-
+			
 					trialPresentationSpace.append(trialFeedback);
-
+			
 					for (let l = 0; l < trial.choices.length; l++) {
 						var str = buttons[l].replace(/%choice%/, trial.choices[l]);
 						$('#jspsych-selection-learning-btngroup').append(
@@ -289,22 +327,22 @@ var jsPsychSelectionLearning = (function (jspsych) {
 								.data('choice', l)
 								.addClass('jspsych-selection-learning-button')
 								.on('click', function (e) {
-
+			
 									// disable all the buttons after a response
 									$('.jspsych-selection-learning-button').off('click')
 										.attr('disabled', 'disabled');
-
+			
 									// hide button
 									$('.jspsych-selection-learning-button').hide();
 									let choice = $('#' + this.id).data('choice');
 								})
 						);
-					};
+					}
 					$('#jspsych-selection-learning-button-0').on('click', function (e) {
 						let viewToc = (new Date()).getTime();
 						let viewRt = viewToc - viewTic;
 						viewRtArray.push(viewRt);
-
+			
 						// RT: STOP STOPWATCH (CLICK)
 						let clickToc = (new Date()).getTime();
 						let clickRt = clickToc - (startTime + clickRtArray.reduce((acc, curr) => acc + curr, 0) + viewRtArray.reduce((acc, curr) => acc + curr, 0));
@@ -315,7 +353,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
 						trialPresentationSpace.empty().hide();
 						trialFormat.html(`<div id="trial-format"></div>`);
 						trialFeedback.html('<div id="selection-buttons"></div>');
-
+			
 						// Fade the prompt back in
 						samplingPromptContainer.html(
 							`<p id="samplingPrompt" style="text-transform: uppercase;">
@@ -323,19 +361,19 @@ var jsPsychSelectionLearning = (function (jspsych) {
 								(scroll to view more)
 							</p>`
 						);
-
+			
 						// Fade the grid back in
 						avatarCircleContainer.removeClass('fade-out-partial')
 							.addClass('fade-in');
 						reattachEventListeners();
 					});
-
+			
 					$('#jspsych-selection-learning-button-1').on('click', function (e) {
 						// RT: STOP STOPWATCH (VIEW)
 						let viewToc = (new Date()).getTime();
 						let viewRt  = viewToc - viewTic;
 						viewRtArray.push(viewRt);
-
+			
 						// RT: STOP STOPWATCH (CLICK)
 						let clickToc = (new Date()).getTime();
 						if (clickRtArray.length === 0) {
@@ -344,14 +382,13 @@ var jsPsychSelectionLearning = (function (jspsych) {
 						else { 
 							var clickRt = clickToc - (startTime + clickRtArray.reduce((acc, curr) => acc + curr, 0) + viewRtArray.reduce((acc, curr) => acc + curr, 0));
 						}
-
+			
 						clickRtArray.push(clickRt);
 						endTrial();
 					});
-
-				}, 1000); //changed this from 5000 to 3000 for the pilot because it feels very long, now 1000
+			
+				}, 1000); 
 			};
-
 			const clickHandlers = {};
 			let currentSelection = null; // Track the current selection
 
@@ -370,8 +407,8 @@ var jsPsychSelectionLearning = (function (jspsych) {
 							selectedSliderRatings.push(sliderRatings[avatarIndex]); // Push selected slider rating to selections
 							currentSelection = avatarNumber; // Update current selection
 
-							currentIndex = randomizedAvatarNumberArray.indexOf(currentSelection);
-							Trustworthiness = trustArray[currentIndex]
+							currentIndex = avatarNumberArray.indexOf(currentSelection);
+							Trustworthiness = combinedTrustArray[currentIndex];
 							avatarTrustworthiness.push(Trustworthiness);
 
 							// <!-- Find positional index of the avatar --> //
@@ -414,10 +451,10 @@ var jsPsychSelectionLearning = (function (jspsych) {
 							};
 
 							$("#circle" + avatarNumber).css("background-color", "#bbb");  // Fades background color
-							if (trustArray[currentIndex] == "avatar-circle-trustworthy") {
-									$("#circle" + avatarNumber).css("border-color", "rgba(1, 67, 202, 0.5)");
-								} else if (trustArray[currentIndex] == "avatar-circle-untrustworthy") {
-									$("#circle" + avatarNumber).css("border-color", "rgba(232, 27, 35, 0.5)");
+							if (combinedTrustArray[avatarNumberArray.indexOf(avatarNumber)] === "avatar-circle-trustworthy") {
+								$("#circle" + avatarNumber).css("border-color", "rgba(128, 130, 135, 0.5)");
+							} else {
+								$("#circle" + avatarNumber).css("border-color", "rgba(128, 130, 135, 0.5)");
 							};
 							$("#circle" + avatarNumber).find("img.avatar-photo").css("opacity", "0.5");  // Fades avatar photo
 							initLearning(avatarIndex, avatarNumber);  // Start trial
@@ -446,21 +483,24 @@ var jsPsychSelectionLearning = (function (jspsych) {
 				const finalTime = (new Date()).getTime();
 				const taskDuration = finalTime - startTime;
 				const trial_data = {
-					"avatar_selections": avatarSelections.join(','),
-					"avatar_position_indices": avatarPositionIndices.join(','),
-					"avatar_position_x_indices": avatarPositionXIndices.join(','),
-					"avatar_position_y_indices": avatarPositionYIndices.join(','),
-					"all_avatars": trustArray,
-					"trustworthy_avatars": trustworthyArray,
-					"untrustworthy_avatars": untrustworthyArray,
-					"selected_slider_ratings": selectedSliderRatings,
-					"click_rt_array": clickRtArray.join(','),
-					"view_rt_array": viewRtArray.join(','),
-					"task_duration": taskDuration
+				  "statement": trial.statement, //Collect statement information
+				  "avatar_selections": avatarSelections.join(','), // Collect avatar selections
+				  "avatar_position_indices": avatarPositionIndices.join(','),
+				  "avatar_position_x_indices": avatarPositionXIndices.join(','),
+				  "avatar_position_y_indices": avatarPositionYIndices.join(','),
+				  "all_avatars": combinedTrustArray,
+				  "trustworthy_avatars": trustworthyArray,
+				  "untrustworthy_avatars": untrustworthyArray,
+				  "selected_slider_ratings": selectedSliderRatings,
+				  "avatar_trustworthiness": avatarTrustworthiness.join(','), // Collect trustworthiness information
+				  "avatar_professions": avatarLabels.join(','), // Collect profession information
+				  "click_rt_array": clickRtArray.join(','),
+				  "view_rt_array": viewRtArray.join(','),
+				  "task_duration": taskDuration
 				};
 				// console.log("Ending trial with data:", trial_data); // Comment this back in for debugging
 				jsPsych.finishTrial(trial_data);
-			};
+			  };
 		};
 	};
 

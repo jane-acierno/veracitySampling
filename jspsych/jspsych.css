@@ -688,11 +688,16 @@
 }
 
 #avatar-container {
+    /* Edits to improve formatting when labels are added */
+  position: relative; 
   display: flex;
-  justify-self: center;
+  flex-direction: column;
+  align-items: center; 
 }
 
 .avatar-circle {
+    /* Edits to improve formatting when labels are added */
+  display: flex; 
   width: 150px;
   height: 150px;
   border-radius: 50%;
@@ -701,6 +706,8 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  margin: auto;
 }
 
 .avatar-circle-none {
@@ -993,6 +1000,19 @@ input.unclickable {
   font-size: 24px;
 }
 
+/* Formatting for profession labels */
+.trustworthiness-label {
+  position:relative;
+  margin-top: -20px;
+  background-color: white;
+  border: 1px solid black;
+  padding: 2px 5px;
+  border-radius: 5px;
+  font-size: 18px;
+  text-align: center;
+  width: auto;
+  z-index: 1;
+}
 
 li {
   margin-bottom: 10px;
