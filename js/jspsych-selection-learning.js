@@ -391,31 +391,32 @@ if (trial.isTrueStatement) {
 			};
 			const clickHandlers = {};
 			let currentSelection = null; // Track the current selection
-
+			
 			for (let avatarIndex = 0; avatarIndex < 100; avatarIndex++) {
 				(function (i) {
 					let avatarNumber = avatarIndex + 1;
 					let isLearningInProgress = false; // Flag variable
 					const clickHandler = function () {
-
-						let currentIndex; 
-						let Trustworthiness;
-
-						if (currentSelection !== avatarNumber) {
+						if (currentSelection !== avatarNumber && !isLearningInProgress && !this.classList.contains('disabled')) {
+							isLearningInProgress = true; // Set flag to indicate learning is in progress
+			
+							let currentIndex; 
+							let Trustworthiness;
+			
 							// <!-- Find actual index of the avatar --> //
 							avatarSelections.push(avatarNumber); // Push circle index to selections
 							selectedSliderRatings.push(sliderRatings[avatarIndex]); // Push selected slider rating to selections
 							currentSelection = avatarNumber; // Update current selection
-
+			
 							currentIndex = avatarNumberArray.indexOf(currentSelection);
 							Trustworthiness = combinedTrustArray[currentIndex];
 							avatarTrustworthiness.push(Trustworthiness);
-
+			
 							// <!-- Find positional index of the avatar --> //
 							// Assuming you have an ID or a class for the parent div
 							var parentDiv = document.getElementById('avatar-grid'); // or use document.querySelector if you have a class
 							var childDivs = parentDiv.children; // or parentDiv.querySelectorAll('div') if you need a more specific selector
-
+			
 							// Function to find the index of a specific sub-div
 							function findSubDivIndex(subDivId) {
 								for (var i = 0; i < childDivs.length; i++) {
@@ -425,31 +426,23 @@ if (trial.isTrueStatement) {
 								};
 								return -1; // Return -1 if the sub-div is not found
 							};
-
+			
 							let avatarPositionIndex = findSubDivIndex('circle' + avatarNumber);
 							avatarPositionIndices.push(avatarPositionIndex);
-
+			
 							let avatarPositionXIndex = avatarPositionIndex % 4;
 							avatarPositionXIndices.push(avatarPositionXIndex);
-
+			
 							let avatarPositionYIndex = Math.floor(avatarPositionIndex / 4);
 							avatarPositionYIndices.push(avatarPositionYIndex);
-
-							let selectedSliderRating = sliderRatings[avatarNumber];
-							selectedSliderRatings.push(selectedSliderRating);
-						};
-
-						if (!isLearningInProgress && !this.classList.contains('disabled')) {
-
-							isLearningInProgress = true; // Set flag to indicate learning is in progress
-
+			
 							// Disable other circles
 							for (let j = 1; j <= 100; j++) {
 								if (j !== i) {
 									$("#circle" + j).addClass('disabled');
 								};
 							};
-
+			
 							$("#circle" + avatarNumber).css("background-color", "#bbb");  // Fades background color
 							if (combinedTrustArray[avatarNumberArray.indexOf(avatarNumber)] === "avatar-circle-trustworthy") {
 								$("#circle" + avatarNumber).css("border-color", "rgba(128, 130, 135, 0.5)");
@@ -461,20 +454,18 @@ if (trial.isTrueStatement) {
 							isLearningInProgress = false;
 						};
 					};
-
+			
 					$("#circle" + avatarNumber).on('click', clickHandler);
 					clickHandlers[avatarIndex] = clickHandler;
-
+			
 					startTime = (new Date()).getTime(); // Store the start time
 				})(avatarIndex);
 			};
-
+			
 			// Function to reattach event listeners
 			function reattachEventListeners() {
 				for (let i = 1; i <= 100; i++) {
-					$("#circle" + i)
-						.removeClass('disabled')
-						.on('click', clickHandlers[i]);
+					$("#circle" + i).removeClass('disabled');
 				};
 				currentSelection = null; // Reset current selection for new phase
 			};
