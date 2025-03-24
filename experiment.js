@@ -409,6 +409,70 @@ const postBelief = {
 // Post-sampling belief
 timeline.push(postBelief);
 
+// VACCINE INTENTIONS
+const vaxxInt = {
+  type: jsPsychSurveyMultiChoice,
+  preamble: `<p>Now, please imagine that a new type of mRNA vaccine has been developed that can offer broad protection against a variety of infectious diseases, such as new strains of the flu, common cold viruses, and other emerging pathogens. This general mRNA vaccine is designed to be updated regularly to adapt to new threats, similar to how current flu vaccines are updated each year.</p>
+  <p>Clinical trials have shown that the vaccine is highly effective, with common side effects like mild fever, headache, or fatigue lasting a few days after the injection. It would be administered once a year and could significantly reduce the chances of getting sick from seasonal viruses and other infections.</p>
+  <p>Given this information, please answer the following questions regarding your willingness to get this vaccine.</p>`,
+  questions: [
+    {
+      name: `vaxxInt1`,
+      prompt: `<blockquote>How likely are you to get the general mRNA vaccine if it becomes available?</blockquote>`,
+      options: ["1 - Very Unlikely", "2", "3", "4", "5", "6", "7 - Very Likely"],
+      required: true,
+      horizontal: true,
+    },
+    {
+      name: `vaxxInt2`,
+      prompt: `<blockquote>How beneficial do you think the general mRNA vaccine would be for your overall health?</blockquote>`,
+      options: ["1 - Not Very Beneficial", "2", "3", "4", "5", "6", "7 - Very Beneficial"],
+      required: true,
+      horizontal: true,
+    },
+    {
+      name: `vaxxInt3`,
+      prompt: `<blockquote>If the general mRNA vaccine were recommended by healthcare providers, how likely would you be to follow this recommendation?</blockquote>`,
+      options: ["1 - Very Unlikely", "2", "3", "4", "5", "6", "7 - Very Likely"],
+      required: true,
+      horizontal: true,
+    },
+    {
+      name: `vaxxInt4`,
+      prompt: `<blockquote>Would you encourage others (family, friends) to get the general mRNA vaccine?</blockquote>`,
+      options: ["1 - Definitely Would Not", "2", "3", "4", "5", "6", "7 - Definitely Would"],
+      required: true,
+      horizontal: true,
+    }
+  ],
+  randomize_question_order: true,
+  on_load: function() {
+    window.scrollTo(0, 0);
+    const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
+    nextButton.disabled = true;
+
+    const checkResponses = () => {
+      const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
+      let allAnswered = true;
+      responses.forEach(response => {
+        const options = response.querySelectorAll('input[type="radio"]');
+        const answered = Array.from(options).some(option => option.checked);
+        if (!answered) {
+          allAnswered = false;
+        }
+      });
+      nextButton.disabled = !allAnswered;
+    };
+
+    document.querySelectorAll('input[type="radio"]').forEach(input => {
+      input.addEventListener('change', checkResponses);
+    });
+  }
+};
+
+// Post-sampling belief
+timeline.push(vaxxInt);
+
 // DEMOGRAPHICS //
 const demographicsQuestions = {
   type: jsPsychSurveyHtmlForm,
