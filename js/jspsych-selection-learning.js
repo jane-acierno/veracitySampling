@@ -115,8 +115,8 @@ if (trial.isTrueStatement) {
 			
 			const trustworthyLabels = [
 				'Primary care physician', 'Urgent care doctor', 'Nurse', 'Pharmacist',
-				'Physiotherapist', 'Cardiologist', 'Dermatologist', 'Ophthalmologist',
-				'Oncologist', 'Neurologist'
+				'Family medicine physician', 'Pediatrician', 'Emergency medicine doctor', 'Immunologist',
+				'Surgeon', 'Physician assistant'
 			];
 			
 			// Create a random array of labels, 50 trustworthy and 50 untrustworthy
