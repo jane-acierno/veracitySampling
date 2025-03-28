@@ -51,7 +51,7 @@ const filename = `${participantId}` + "_" + `${studyId}` + "_" + `${sessionId}.c
 const valueOpinionOptions = ['Yes', 'Somewhat', 'No'];
 
 // Belief options
-const beliefOptions = ['Definitely false', '', '', '', '','', 'Defintely True'];
+const beliefOptions = ['1=Definitely false', '2', '3', '4', '5','6', '7=Defintely True'];
 
 // Statements
 const statements = [
@@ -184,7 +184,7 @@ const preBelief = {
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
     prompt: `<blockquote>${statements[index]}</blockquote>`,
-    options: ["Definitely False","","","","","","Definitely True"],
+    options: ["1=Definitely False","2","3","4","5","6","7=Definitely True"],
     required: true,
     horizontal: true,
   })),
