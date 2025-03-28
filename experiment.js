@@ -301,7 +301,7 @@ const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-        Thank you! Now you will get to see what various health providers have to say. 
+        Thank you! Now you will be able to see what various health providers have to say about these claims. 
         </p>`
       ],
       show_clickable_nav: true,
@@ -1166,18 +1166,18 @@ const save_data = {
       }, 1000);
     }
 
-    countdown(10, 0);
+    countdown(5, 0);
 
     const results = jsPsych.data.get().csv();
     jsPsych.endExperiment(
       `<p class="jspsych-center">
-        Thanks for completing the first half of the experiment! You will be redirected to Qualtrics to complete the remainder of the study in <span id="countdown">10</span> seconds.
+        Thanks for completing the first half of the experiment! You will be redirected to Qualtrics to complete the remainder of the study in <span id="countdown">5</span> seconds.
       </p>`
     );
 
     setTimeout(function () {
       window.location.href = "https://neu.co1.qualtrics.com/jfe/form/SV_2i3DAsAHEfa4rga";
-    }, 10000);
+    }, 5000);
   }
 };
 
