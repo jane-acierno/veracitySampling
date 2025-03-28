@@ -302,11 +302,7 @@ const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-        Now you get to see what people of various professions have to say. 
-        The avatars below represent people with the professions listed. 
-        Every time you click on an avatar, you will see whether that person 
-        thought the claim above was true or false. You can view the opinions 
-        of as many people as you would like before moving on.
+        Thank you! Now you get to see what people of various professions have to say. 
         </p>`
       ],
       show_clickable_nav: true,
@@ -319,7 +315,7 @@ const preSamplingInstructions = {
       nextButton.disabled = true;
       setTimeout(() => {
         nextButton.disabled = false;
-      }, 5000);
+      }, 2000);
     }
   }
 };
