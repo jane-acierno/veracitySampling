@@ -441,8 +441,8 @@ const vaxxInt = {
     },
     {
       name: `vaxxInt4`,
-      prompt: `<blockquote>Would you encourage others (family, friends) to get the general mRNA vaccine?</blockquote>`,
-      options: ["1 - Definitely Would Not", "2", "3", "4", "5", "6", "7 - Definitely Would"],
+      prompt: `<blockquote>How likely would you be to encourage others (family, friends) to get the general mRNA vaccine?</blockquote>`,
+      options: ["1 - Very Unlikely", "2", "3", "4", "5", "6", "7 - Very Likely"],
       required: true,
       horizontal: true,
     }
