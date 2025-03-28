@@ -22,11 +22,16 @@ const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment'
 
 // Define the false and true statements such that first 9 are false, and last 9 are true 
 // This is consistent with the order in the statements array
-const falseStatements = [0, 1, 2, 3, 4, 5, 6, 7, 8];
-const trueStatements = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+// const falseStatements = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+// const trueStatements = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+
+// Changed so we just use 4 of each
+const falseStatements = [0, 1, 7, 8];
+const trueStatements = [9, 13, 15, 17];
+
 // Randomly sample 3 false and 3 true statements without replacement. 
-const sampledFalseStatements = jsPsych.randomization.sampleWithoutReplacement(falseStatements, 3);
-const sampledTrueStatements = jsPsych.randomization.sampleWithoutReplacement(trueStatements, 3);
+const sampledFalseStatements = jsPsych.randomization.sampleWithoutReplacement(falseStatements, 4);
+const sampledTrueStatements = jsPsych.randomization.sampleWithoutReplacement(trueStatements, 4);
 // Shuffle order of statements
 const trials = jsPsych.randomization.shuffle([...sampledFalseStatements, ...sampledTrueStatements]);
 
@@ -39,8 +44,8 @@ jsPsych.data.addProperties({
   expcondition: expcondition
 });
 
-// const filename = `${participantId}` + "_" + `${studyId}` + "_" + `${sessionId}.csv`;
-const filename = "debug.csv"
+const filename = `${participantId}` + "_" + `${studyId}` + "_" + `${sessionId}.csv`;
+// const filename = "debug.csv"
 
 // Options
 const valueOpinionOptions = ['Yes', 'Somewhat', 'No'];
@@ -168,7 +173,8 @@ const consentForm = {
   }
 };
 
-timeline.push(consentForm);
+// Removed because now it redirects from Qualtrics
+// timeline.push(consentForm);
 
 // Pre-sampling belief ratings for only the selected trials
 // added a scroll to top function to ensure the page starts at the top (added to all pages)
@@ -179,7 +185,7 @@ const preBelief = {
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
     prompt: `<blockquote>${statements[index]}</blockquote>`,
-    options: ["Strongly Disagree","","","","","","Strongly Agree"],
+    options: ["Definitely False","","","","","","Definitely True"],
     required: true,
     horizontal: true,
   })),
@@ -379,7 +385,7 @@ const postBelief = {
   questions: trials.map((index) => ({
     name: `preBelief${index + 1}`,
     prompt: `<blockquote>${statements[index]}</blockquote>`,
-    options: ["Strongly Disagree","","","","","","Strongly Agree"],
+    options: ["Definitely False","","","","","","Definitely True"],
     required: true,
     horizontal: true,
   })),
@@ -1098,14 +1104,14 @@ const exitFullscreen = {
 timeline.push(exitFullscreen);
 
 // Choose from among these to relay via DataPipe
-const preregisteredExperimentId = "jWr5Nul5HYl2"; 
+const preregisteredExperimentId = "pTWSMZwhLgng"; 
 const debugExperimentId = "XyR978iH6AOX";
 
 // DataPipe conclude data collection
 const save_data = {
   type: jsPsychPipe,
   action: "save",
-  experiment_id: "pTWSMZwhLgng",
+  experiment_id: preregisteredExperimentId,
   //experiment_id: debugExperimentId, 
   filename: filename,
   data_string: () => jsPsych.data.get().csv(),
@@ -1125,16 +1131,14 @@ const save_data = {
 
     const results = jsPsych.data.get().csv();
     jsPsych.endExperiment(
-      //  Removed for now, will add back     Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
       `<p class="jspsych-center">
-      </p>
-      <pre>${results}</pre>` //Check results
+        Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
+      </p>`
     );
 
-    // Commenting out the redirection for now
-    // setTimeout(function () {
-    //   window.location.href = "https://app.prolific.com/submissions/complete?cc=CNN3F4P4";
-    // }, 5000);
+    setTimeout(function () {
+      window.location.href = "https://app.prolific.com/submissions/complete?cc=CNN3F4P4";
+    }, 5000);
   }
 };
 
