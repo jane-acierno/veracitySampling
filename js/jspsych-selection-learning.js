@@ -46,7 +46,7 @@ var jsPsychSelectionLearning = (function (jspsych) {
                         <h2>Search Task</h2>
                         <p>Now you can see what various health providers think. 
 						Click on an avatar to see that provider's opinion on the following sentence.</p>
-                        <blockquote>${trial.statement}</blockquote>
+                        <blockquote style="font-size: 1.25em; font-weight: bold; font-style: normal;">  ${trial.statement} </blockquote>
 						<p>You can view as many avatars as you would like before moving on.</p>
 					</div>
 				</div>` +
