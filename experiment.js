@@ -26,12 +26,12 @@ const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment'
 // const trueStatements = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
 // Changed so we just use 4 of each
-const falseStatements = [0, 1, 7, 8];
-const trueStatements = [9, 13, 15, 17];
+const falseStatements = [0, 7, 8];
+const trueStatements = [13, 15, 17];
 
 // Randomly sample 3 false and 3 true statements without replacement. 
-const sampledFalseStatements = jsPsych.randomization.sampleWithoutReplacement(falseStatements, 4);
-const sampledTrueStatements = jsPsych.randomization.sampleWithoutReplacement(trueStatements, 4);
+const sampledFalseStatements = jsPsych.randomization.sampleWithoutReplacement(falseStatements, 3);
+const sampledTrueStatements = jsPsych.randomization.sampleWithoutReplacement(trueStatements, 3);
 // Shuffle order of statements
 const trials = jsPsych.randomization.shuffle([...sampledFalseStatements, ...sampledTrueStatements]);
 
@@ -334,7 +334,7 @@ timeline.push(preSamplingInstructions);
         statement: statements[statementIndex],
         isTrueStatement: isTrueStatement, // Added to indicate if the statement is true or false
         choices: [
-          "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;Continue sampling",
+          "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;View more",
           "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done"
         ],
         on_load: function() {
