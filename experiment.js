@@ -1166,18 +1166,18 @@ const save_data = {
       }, 1000);
     }
 
-    countdown(5, 0);
+    countdown(10, 0);
 
     const results = jsPsych.data.get().csv();
     jsPsych.endExperiment(
       `<p class="jspsych-center">
-        Thanks for participating! You will be redirected in <span id="countdown">5</span> seconds.
+        Thanks for completing the first half of the experiment! You will be redirected to Qualtrics to complete the remainder of the study in <span id="countdown">10</span> seconds.
       </p>`
     );
 
     setTimeout(function () {
-      window.location.href = "https://app.prolific.com/submissions/complete?cc=CNN3F4P4";
-    }, 5000);
+      window.location.href = "https://neu.co1.qualtrics.com/jfe/form/SV_2i3DAsAHEfa4rga";
+    }, 10000);
   }
 };
 
