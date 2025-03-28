@@ -117,8 +117,8 @@ const consentForm = {
       </p>
       <ul style="list-style-position: outside; padding-left: 20px;">
         <li>You must be at least 18 years old to take part in this research.</li>
-        <li>The study will take approximately 3-4 minutes to complete.</li>
-        <li>You will receive $0.70 for your participation in the study.</li>
+        <li>The study will take approximately 15 minutes to complete.</li>
+        <li>You will be compensated at a rate of $12 per hour for your participation in the study.</li>
         <li>The possible risks or discomforts of the study are minimal. You may feel uncomfortable reflecting on and answering some questions.</li>
         <li>There are no direct benefits for participating in the study.</li>
         <li>Your part in this study will be handled in a confidential manner. 
@@ -173,8 +173,7 @@ const consentForm = {
   }
 };
 
-// Removed because now it redirects from Qualtrics
-// timeline.push(consentForm);
+timeline.push(consentForm);
 
 // Pre-sampling belief ratings for only the selected trials
 // added a scroll to top function to ensure the page starts at the top (added to all pages)
@@ -302,7 +301,7 @@ const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-        Thank you! Now you get to see what people of various professions have to say. 
+        Thank you! Now you will get to see what various health providers have to say. 
         </p>`
       ],
       show_clickable_nav: true,
@@ -902,7 +901,7 @@ const demographicsQuestions = {
         </style>
       `,
       button_label: 'Next',
-      request_response: true, // We should require response
+      required: true,
       on_load: function() {
         window.scrollTo(0, 0);
       },
@@ -944,7 +943,7 @@ const demographicsQuestions = {
   }
 };
 
-timeline.push(demographicsQuestions);
+// timeline.push(demographicsQuestions);
 
 
 const politicsQuestions = {
@@ -1001,7 +1000,7 @@ const politicsQuestions = {
   }
 };
 
-timeline.push(politicsQuestions);
+// timeline.push(politicsQuestions);
 
 
 const demandEffectsQuestions = {
@@ -1027,7 +1026,7 @@ const demandEffectsQuestions = {
     }
   ],
   randomize_question_order: true,
-  request_response: true, // We should require response
+  required: true,
   scale_width: 500,
   preamble:
     `<p class="jspsych-survey-multi-choice-preamble">
@@ -1051,7 +1050,7 @@ const demandEffectsQuestions = {
   }
 };
 
-timeline.push(demandEffectsQuestions);
+// timeline.push(demandEffectsQuestions);
 
 
 // Guess Study Purpose / Questions + Comments
@@ -1088,7 +1087,51 @@ const feedback = {
   }
 }
 
-timeline.push(feedback);
+// timeline.push(feedback);
+
+
+// DEBRIEF FORM
+const debriefForm = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: `
+    <div style="text-align: left; max-width: 800px; margin: auto;">
+    <h2 style="text-align: center"><strong>Debriefing Sheet</strong></h2>
+    <h3 style="text-align: center"><strong>Processing health information</strong></h3>
+    <h3 style="text-align: center"><strong>Northeastern University IRB # 20-12-16</strong></h3>
+      <p>Thank you for participating in our study! 
+      This study seeks to investigate the effects of a media literacy intervention on information seeking from different sources. 
+      In the study you just participated in, we assigned people to either the intervention or control condition.  
+      During the study you viewed eight vaccine-related claims, four of which were true and four of which were false. 
+      Please find the fact checks below for each of the claims. </p>
+      <p>You were also given the opportunity to sample the beliefs of a range of medical professionals and alternative medicine practitioners. 
+      These belief ratings were entirely simulated, set such that belief ratings for medical professionals were always accurate, 
+      and belief ratings from alternative medicine practitioners was always inaccurate. </p>
+      <p>
+        <strong>"You can test positive for HPV as a result of receiving the HPV vaccine."</strong> - This is <span style="color: red;"><strong>FALSE</strong></span>
+      </p>
+      <p style="text-indent: 40px;">
+        As outlined by <a href="https://www.chop.edu/vaccine-education-center/vaccine-details/human-papillomavirus/prevent-hpv" target="_blank">the Children’s Hospital of Philadelphia</a>, the HPV vaccine cannot cause a positive test result for HPV. The HPV vaccine is created using a protein from the surface of the HPV virus but does not contain any genetic material from the live virus itself. Because of this, the particles in the HPV vaccine cannot replicate and cause an infection. 
+      </p>
+      <p>
+        <strong>"Vaccines can cure chronic illnesses if they target the underlying virus or bacteria."</strong> - <span style="color: red;"><strong>FALSE</strong></span>
+      </p>
+      <p style="text-indent: 40px;">
+        Vaccines are designed to prevent infection, not to treat an underlying disease or illness. They work by stimulating the immune system to recognize and combat specific pathogens before an individual becomes infected (<a href="https://www.cdc.gov/vaccines/basics/explaining-how-vaccines-work.html" target="_blank">CDC, 2024</a>). While vaccines have been instrumental in preventing diseases, they are not used to cure existing chronic illnesses.  
+      </p>
+      <p>
+        <strong>"Certain vaccines can alter your DNA."</strong> - This is <span style="color: red;"><strong>FALSE</strong></span>
+      </p>
+      <p style="text-indent: 40px;">
+      Vaccines cannot alter your DNA. mRNA vaccines work by instructing your body to build protein to protect against specific viruses, such as COVID-19. As <a href="https://www.genome.gov/about-genomics/fact-sheets/Understanding-COVID-19-mRNA-Vaccines" target="_blank">National Human Genome Research Institute (2021)</a>, explains, mRNA from vaccines does not enter the nucleus where DNA is located, and can thus not interact with or alter DNA. 
+      </p>
+      <p><b>Pleas click "Next" to be redirected to Prolific to recieve compensation.</b></p>
+    </div>
+  `,
+  choices: ["Next"],
+};
+
+// timeline.push(debriefForm);
+
 
 // Exit fullscreen
 const exitFullscreen = {
