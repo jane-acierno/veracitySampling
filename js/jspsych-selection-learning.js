@@ -314,7 +314,7 @@ if (trial.isTrueStatement) {
 			
 					trialFeedback.html(`
 						<hr></hr>
-						<p>Would you like to continue sampling?</p>
+						<p>Would you like to view more responses?</p>
 						<div id="jspsych-selection-learning-btngroup" class="center-content block-center"></div>`
 					);
 			
