@@ -44,8 +44,10 @@ var jsPsychSelectionLearning = (function (jspsych) {
 			<div id="jspsych-instructions">
                     <div class="quote">
                         <h2>Search Task</h2>
-                        <p>Now you will have a chance to see what various health providers think. Click on an avatar to see that provider's opinion on the following sentence:</p>
+                        <p>Now you can see what various health providers think. 
+						Click on an avatar to see that provider's opinion on the following sentence.</p>
                         <blockquote>${trial.statement}</blockquote>
+						<p>You can view as many avatars as you would like before moving on.</p>
 					</div>
 				</div>` +
 				`<div id="trial-presentation-space" class="popup"></div><div id="overlay"></div>` +
