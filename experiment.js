@@ -25,7 +25,7 @@ const expcondition = jsPsych.randomization.sampleWithoutReplacement(['treatment'
 // const falseStatements = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 // const trueStatements = [9, 10, 11, 12, 13, 14, 15, 16, 17];
 
-// Changed so we just use 4 of each
+// Changed so we just use 3 of each
 const falseStatements = [0, 7, 8];
 const trueStatements = [13, 15, 17];
 
@@ -117,7 +117,7 @@ const consentForm = {
       </p>
       <ul style="list-style-position: outside; padding-left: 20px;">
         <li>You must be at least 18 years old to take part in this research.</li>
-        <li>The study will take approximately 15 minutes to complete.</li>
+        <li>The study will take approximately 12 minutes to complete.</li>
         <li>You will be compensated at a rate of $12 per hour for your participation in the study.</li>
         <li>The possible risks or discomforts of the study are minimal. You may feel uncomfortable reflecting on and answering some questions.</li>
         <li>There are no direct benefits for participating in the study.</li>
@@ -175,57 +175,16 @@ const consentForm = {
 
 timeline.push(consentForm);
 
-// Pre-sampling belief ratings for only the selected trials
-// added a scroll to top function to ensure the page starts at the top (added to all pages)
-// Disable next button until all questions are answered
-const preBelief = {
-  type: jsPsychSurveyMultiChoice,
-  preamble: `<p><strong>First, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
-  questions: trials.map((index) => ({
-    name: `preBelief${index + 1}`,
-    prompt: `<blockquote>${statements[index]}</blockquote>`,
-    options: ["1 - Definitely False","2","3","4","5","6","7 - Definitely True"],
-    required: true,
-    horizontal: true,
-  })),
-  randomize_question_order: true,
-  on_load: function() {
-    window.scrollTo(0, 0);
-    const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
-    nextButton.disabled = true;
-
-    const checkResponses = () => {
-      const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
-      let allAnswered = true;
-      responses.forEach(response => {
-        const options = response.querySelectorAll('input[type="radio"]');
-        const answered = Array.from(options).some(option => option.checked);
-        if (!answered) {
-          allAnswered = false;
-        }
-      });
-      nextButton.disabled = !allAnswered;
-    };
-
-    document.querySelectorAll('input[type="radio"]').forEach(input => {
-      input.addEventListener('change', checkResponses);
-    });
-  }
-};
-
-// Pre-sampling belief
-timeline.push(preBelief);
-
 // Pre-intervention instructions
 const preIntInstructions = {
   type: jsPsychInstructions,
   pages: [`
         <p style="text-align: left;">
-          Thank you for answering those questions.
+          Thank you for agreeing to participate.
         </p>
         <p style="text-align: left;">
-        On the next page you will receive some additional information.
-        Please read the information carefully before continuing.
+        On the next page, you will receive some information.
+        Please read the information carefully before continuing to the main task.
         </p>`
       ],
       show_clickable_nav: true,
@@ -300,9 +259,15 @@ if (expcondition === 'treatment') {
 const preSamplingInstructions = {
   type: jsPsychInstructions,
   pages: [`
-        <p style="text-align: left;">
-        Thank you! Now you will be able to see what various health providers have to say about these claims. 
-        </p>`
+    <p style="text-align: left; line-height: 1.6;">
+      Thank you! Now you will be presented with some claims that we would like you to rate your level of belief in.
+      </p>
+      <p style="text-align: left; line-height: 1.6;">
+  After you rate your belief, you will have the opportunity to see some health providers' beliefs about the information.
+  </p>
+  <p style="text-align: left; line-height: 1.6;">
+    You can choose to see information from as many or as few health providers as you like.
+    </p>`
       ],
       show_clickable_nav: true,
       on_load: function() {
@@ -314,7 +279,7 @@ const preSamplingInstructions = {
       nextButton.disabled = true;
       setTimeout(() => {
         nextButton.disabled = false;
-      }, 2000);
+      }, 5000);
     }
   }
 };
@@ -366,35 +331,31 @@ const blankPage = {
   trial_duration: 20 // should test to make sure this is enough on other computers as well
 };
 
-// Sampling Task
-for (let i = 0; i < trials.length; i++) {
-  timeline.push(selectionTask(i)); 
-  timeline.push(blankPage);
-}
+// Restructure the experiment flow to rate, sample, and rerate each claim
 
-// Post-sampling belief ratings for only the selected trials
-// Still having issues with required response
-const postBelief = {
-  type: jsPsychSurveyMultiChoice,
-  preamble: `<p><strong>Now, please rate the extent to which you believe each claim is true (vs false).</strong></p>`,
-  questions: trials.map((index) => ({
-    name: `preBelief${index + 1}`,
-    prompt: `<blockquote>${statements[index]}</blockquote>`,
-    options: ["1 - Definitely False","2","3","4","5","6","7 - Definitely True"],
-    required: true,
-    horizontal: true,
-  })),
-  randomize_question_order: true,
-  on_load: function () {
-    window.scrollTo(0, 0);
-
-    const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
-    if (nextButton) {
+// Loop through each trial (claim)
+trials.forEach((trialIndex) => {
+  // Pre-sampling belief rating for the current claim
+  const preBelief = {
+    type: jsPsychSurveyMultiChoice,
+    preamble: `<p>Please rate the extent to which you believe the following claim is true (vs false).</p>`,
+    questions: [
+      {
+        name: `preBelief${trialIndex + 1}`,
+        prompt: `<blockquote style="font-size: 1.25em; font-weight: bold; font-style: normal;">${statements[trialIndex]}</blockquote>`,
+        options: ["1 - Definitely False", "2", "3", "4", "5", "6", "7 - Definitely True"],
+        required: true,
+        horizontal: true,
+      },
+    ],
+    on_load: function () {
+      window.scrollTo(0, 0);
+      const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
       nextButton.disabled = true;
 
       const checkResponses = () => {
         const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
-        let allAnswered = Array.from(responses).every(response => 
+        let allAnswered = Array.from(responses).every(response =>
           Array.from(response.querySelectorAll('input[type="radio"]')).some(option => option.checked)
         );
         nextButton.disabled = !allAnswered;
@@ -403,13 +364,73 @@ const postBelief = {
       document.querySelectorAll('input[type="radio"]').forEach(input => {
         input.addEventListener('change', checkResponses);
       });
-    }
-  }
-};
+    },
+  };
 
-// Post-sampling belief
-timeline.push(postBelief);
+  // Sampling task for the current claim
+  const samplingTask = {
+    type: jsPsychSelectionLearning,
+    trialIndex: trialIndex,
+    avatars: avatarDictionary,
+    statement: statements[trialIndex],
+    isTrueStatement: trialIndex >= 9, // False statements are indexed from 0 to 8, True statements are indexed from 9 to 17
+    choices: [
+      "<i class='fa-solid fa-rotate-left'></i>&nbsp;&nbsp;View more",
+      "<i class='fa-solid fa-circle-check' style='color: green'></i>&nbsp;&nbsp;I'm all done",
+    ],
+    on_load: function () {
+      window.scrollTo(0, 0);
+    },
+  };
 
+  // Blank page to avoid issues with sampling task
+  const blankPage = {
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: '',
+    choices: "NO_KEYS",
+    trial_duration: 20, // Adjust this duration if needed
+  };
+
+  // Post-sampling belief rating for the current claim
+  const postBelief = {
+    type: jsPsychSurveyMultiChoice,
+    preamble: `<p>Now, please <strong>re-rate</strong> the extent to which you believe the following claim is true (vs false).</p>`,
+    questions: [
+      {
+        name: `postBelief${trialIndex + 1}`,
+        prompt: `<blockquote style="font-size: 1.25em; font-weight: bold; font-style: normal;">${statements[trialIndex]}</blockquote>`,
+        options: ["1 - Definitely False", "2", "3", "4", "5", "6", "7 - Definitely True"],
+        required: true,
+        horizontal: true,
+      },
+    ],
+    on_load: function () {
+      window.scrollTo(0, 0);
+      const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
+      nextButton.disabled = true;
+
+      const checkResponses = () => {
+        const responses = document.querySelectorAll('.jspsych-survey-multi-choice-question');
+        let allAnswered = Array.from(responses).every(response =>
+          Array.from(response.querySelectorAll('input[type="radio"]')).some(option => option.checked)
+        );
+        nextButton.disabled = !allAnswered;
+      };
+
+      document.querySelectorAll('input[type="radio"]').forEach(input => {
+        input.addEventListener('change', checkResponses);
+      });
+    },
+  };
+
+  // Add the tasks for the current claim to the timeline
+  timeline.push(preBelief);
+  timeline.push(samplingTask);
+  timeline.push(blankPage);
+  timeline.push(postBelief);
+});
+
+// Post-sampling belief ratings for only the selected trials
 // VACCINE INTENTIONS
 const vaxxInt = {
   type: jsPsychSurveyMultiChoice,
@@ -446,7 +467,7 @@ const vaxxInt = {
       horizontal: true,
     }
   ],
-  randomize_question_order: true,
+  randomize_question_order: false,
   on_load: function() {
     window.scrollTo(0, 0);
     const nextButton = document.querySelector('#jspsych-survey-multi-choice-next');
