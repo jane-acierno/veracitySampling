@@ -117,8 +117,8 @@ const consentForm = {
       </p>
       <ul style="list-style-position: outside; padding-left: 20px;">
         <li>You must be at least 18 years old to take part in this research.</li>
-        <li>The study will take approximately 12 minutes to complete.</li>
-        <li>You will be compensated at a rate of $12 per hour for your participation in the study.</li>
+        <li>The study will take approximately 15 minutes to complete.</li>
+        <li>You will be compensated $3 for your participation in the study.</li>
         <li>The possible risks or discomforts of the study are minimal. You may feel uncomfortable reflecting on and answering some questions.</li>
         <li>There are no direct benefits for participating in the study.</li>
         <li>Your part in this study will be handled in a confidential manner. 
@@ -266,7 +266,7 @@ const preSamplingInstructions = {
   After you rate your belief, you will have the opportunity to see some health providers' beliefs about the information.
   </p>
   <p style="text-align: left; line-height: 1.6;">
-    You can choose to see information from as many or as few health providers as you like.
+    You can choose to see information from as many health providers as you like.
     </p>`
       ],
       show_clickable_nav: true,
