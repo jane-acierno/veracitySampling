@@ -240,7 +240,7 @@ if (trial.isTrueStatement) {
 				const specificLabelElement = $(`<div class='specific-label'>${specificLabel}</div>`);
 				avatarCircleSelection.append(specificLabelElement);
 			
-				let ratingPrompt = `Belief rating: ${sliderRatings[avatarIndex]}/7 belivability`;
+				let ratingPrompt = `Belief rating: ${sliderRatings[avatarIndex]}/7 believability`;
 				const textDownRating = "1";
 				const textUpRating   = "7";
 			
